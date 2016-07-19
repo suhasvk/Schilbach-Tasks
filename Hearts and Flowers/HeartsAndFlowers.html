@@ -1,0 +1,43 @@
+<!-- main.html -->
+<head>
+	<script src="lib/jquery.min.js"></script>
+	<script src="src/HeartsAndFlowersLib.js"/></script>
+	<script src="src/HeartsAndFlowersModel.js"/></script>
+	<script src="src/HeartsAndFlowersController.js"/></script>
+	<link rel="stylesheet" type="text/css" href="HeartsAndFlowers.css"/>
+</head>
+<body>
+	<div class="center" id="gameArea" width="100%">
+
+		<!-- Game content -->
+		<div id="leftContainer" class="left-half">
+			<img class="stimulus" id="heartLeft" src="img/hearts.svg"/>
+			<img class="stimulus" id="flowerLeft" src="img/flower.svg"/>
+		</div>
+		<div class="right-half">
+			<img class="stimulus" id="heartRight" src="img/hearts.svg"/>
+			<img class="stimulus" id="flowerRight" src="img/flower.svg"/>
+		</div>
+
+		<!-- Instructions panels -->
+		<div class="both-halves blue instructions" id="mainHelp">
+			<div class="instructions-text"><h1>Poop!</h1> </div>
+		</div>
+
+		<div class="left-half green instructions" id="leftCorrectHelp">
+			<h1 class="instructions-text">Good :)</h1>
+		</div>
+
+		<div class="left-half red instructions" id="leftIncorrectHelp">
+			  <h1 class="instructions-text"> Bad :(</h1> 
+		</div>
+
+		<div class="right-half green instructions" id="rightCorrectHelp">
+			 <h1 class="instructions-text">Good :)</h1>
+		</div>
+
+		<div class="right-half red instructions" id="rightIncorrectHelp">
+			 <h1 class="instructions-text"> Bad :(</h1> 
+		</div>
+	</div>
+</body>

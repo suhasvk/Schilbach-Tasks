@@ -1,0 +1,48 @@
+<!-- main.html -->
+<!DOCTYPE html5>
+<html>
+	<head>
+
+		<script src="lib/jquery/jquery.min.js"></script>
+		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+		<script src="src/main.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css"/>
+		<!-- <link rel="stylesheet" type="text/css" href="main.css"/> -->
+
+	</head>
+	<body>
+
+		<!-- Initial settings input area -->
+		<div class="modal fade" id="initialSettingsModal" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<a class="close" data-dismiss="modal">&times;</a>
+						<h3>Session default settings</h3>
+					</div>
+					<div class="modal-body">
+						<fieldset class="form-horizontal" role="form">
+	                  		<div class="form-group">
+			                    <label  class="col-sm-2 control-label" for="ridInput">R.I.D.</label>
+			                    <div class="col-sm-10">
+			                        <input type="number" class="form-control" id="ridInput" placeholder="Enter your RID here."></input>
+			                    </div>
+	                 		</div>
+	                  		<div class="form-group">
+			                    <label  class="col-sm-2 control-label" for="taskSelector">Task</label>
+			                    <div class="col-sm-10">
+			                        <select type="text" class="form-control" id="taskSelector"></select>
+			                    </div>
+	                 		</div>
+              			</fieldset>
+					</div>
+					<div class="modal-footer">
+						<a id="initExitButton" href="#" class="btn">Exit</a>
+						<a id="configureDefaultSettingsButton" href="#" class="btn btn-primary">Configure Default Settings</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
