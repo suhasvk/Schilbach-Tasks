@@ -7,10 +7,13 @@
 GLOBALS
 *******/
 // jQuery selectors
-INITIAL_SETINGS_MODAL_SELECTOR = '#initialSettingsModal';
+SETUP_MODAL_SELECTOR = '#setupModal';
+SETTINGS_MODAL_SELECTOR = '#settingsModal';
 TASK_SELECT_LIST_SELECTOR = '#taskSelector';
 EXIT_BUTTON_SELECTOR = '#initExitButton';
 CONFIGURE_DEFAULT_SETTINGS_BUTTON_SELECTOR = "#configureDefaultSettingsButton";
+SETUP_RID_INPUT_SELECTOR = '#ridInput';
+SETUP_TASK_INPUT_SELECTOR = '#taskSelector';
 
 // Game names
 TASK_NAME_HEARTSANDFLOWERS = 'Hearts and Flowers';
@@ -26,6 +29,10 @@ AVAILABLE_TASKS_LIST = [
 CONTROLLERS
 **********/
 function SettingsController() {
+
+	self.createNewSetting = function(init, taskType){
+		$(SETTINGS_MODAL_SELECTOR).modal('show');
+	};
 	// Populate task selection list
 	$.each(AVAILABLE_TASKS_LIST, function(index, value){
 		var optionElement = document.createElement("option");
@@ -41,14 +48,23 @@ function SettingsController() {
 
 	// Activate the 'configure default settings' button
 	$(CONFIGURE_DEFAULT_SETTINGS_BUTTON_SELECTOR).click(function(evt,err){
+		var rid = $(SETUP_RID_INPUT_SELECTOR).val();
+		var task  = $(SETUP_TASK_INPUT_SELECTOR).val();
 
+		currentSession = new Session({
+			RID: rid,
+			taskType: task
+		});
+		// Todo (db): cache session details
+
+		$(SETUP_MODAL_SELECTOR).modal('hide');
+		self.createNewSetting(true,task);
 	});
-
 }
 
 // Code to execute on page load.
 $(document).ready(function(){
 	sttingsController = new SettingsController();
-	$(INITIAL_SETINGS_MODAL_SELECTOR).modal('show');
+	$(SETUP_MODAL_SELECTOR).modal('show');
 });
 
