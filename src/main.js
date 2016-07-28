@@ -15,6 +15,9 @@ CONFIGURE_DEFAULT_SETTINGS_BUTTON_SELECTOR = "#configureDefaultSettingsButton";
 SETUP_RID_INPUT_SELECTOR = '#ridInput';
 SETUP_TASK_INPUT_SELECTOR = '#taskSelector';
 
+SETUP_RID_INPUT_AND_GAME = '#ridInputAndGameSelection';
+SETUP_CHOOSE_SETTINGS = '#settingsSelector';
+
 // Game names
 TASK_NAME_HEARTSANDFLOWERS = 'Hearts and Flowers';
 TASK_NAME_CORSI = 'Corsi';
@@ -55,7 +58,6 @@ function SettingsController() {
 			RID: rid,
 			taskType: task
 		});
-		// Todo (db): cache session details
 
 		$(SETUP_MODAL_SELECTOR).modal('hide');
 		self.createNewSetting(true,task);

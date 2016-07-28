@@ -10,7 +10,7 @@
 		<script src="src/main.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css"/>
-		<!-- <link rel="stylesheet" type="text/css" href="main.css"/> -->
+		<link rel="stylesheet" type="text/css" href="main.css"/>
 
 	</head>
 	<body>
@@ -24,56 +24,62 @@
 						<h3>Session Setup</h3>
 					</div>
 					<div class="modal-body">
-						<fieldset class="form-horizontal" role="form">
-	                  		<div class="form-group">
-			                    <label  class="col-sm-2 control-label" for="ridInput">R.I.D.</label>
-			                    <div class="col-sm-10">
-			                        <input type="number" class="form-control" id="ridInput" placeholder="Enter your RID here."></input>
-			                    </div>
-	                 		</div>
-	                  		<div class="form-group">
-			                    <label  class="col-sm-2 control-label" for="taskSelector">Task</label>
-			                    <div class="col-sm-10">
-			                        <select type="text" class="form-control" id="taskSelector"></select>
-			                    </div>
-	                 		</div>
-              			</fieldset>
-					</div>
-					<div class="modal-footer">
-						<a id="initExitButton" href="#" class="btn">Exit</a>
-						<a id="configureDefaultSettingsButton" href="#" class="btn btn-primary">Configure Default Settings</a>
-					</div>
-				</div>
-			</div>
-		</div>
 
-		<!-- Settings input area -->
-		<div class="modal fade" id="settingsModal" role="dialog">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<a class="close" data-dismiss="modal">&times;</a>
-						<h3>Default Settings</h3>
-					</div>
-					<div class="modal-body">
-						<fieldset class="form-horizontal" role="form">
-	                  		<div class="form-group">
-			                    <label  class="col-sm-2 control-label" for="ridInput">R.I.D.</label>
-			                    <div class="col-sm-10">
-			                        <input type="number" class="form-control" id="ridInput" placeholder="Enter your RID here."></input>
-			                    </div>
-	                 		</div>
-	                  		<div class="form-group">
-			                    <label  class="col-sm-2 control-label" for="taskSelector">Task</label>
-			                    <div class="col-sm-10">
-			                        <select type="text" class="form-control" id="taskSelector"></select>
-			                    </div>
-	                 		</div>
-              			</fieldset>
+						<div class="container-fluid ridInputPaneItem">
+							<h4
+							<fieldset class="form-horizontal" role="form">
+		                  		<div class="form-group">
+				                    <label  class="col-sm-2 control-label" for="ridInput">R.I.D.</label>
+				                    <div class="col-sm-10">
+				                        <input type="number" class="form-control" id="ridInput" placeholder="Enter your RID here."></input>
+				                    </div>
+		                 		</div>
+		                  		<div class="form-group">
+				                    <label  class="col-sm-2 control-label" for="taskSelector">Task</label>
+				                    <div class="col-sm-10">
+				                        <select type="text" class="form-control" id="taskSelector"></select>
+				                    </div>
+		                 		</div>
+	              			</fieldset>
+	              		</div>
+
+	              		<div class="container-fluid presetPaneItem">
+	              			<h4> Choose preconfigured settings? </h4>
+	              			<fieldset class="form-horizontal" role="form" >
+		                  		<div class="form-group">
+		                  			<label  class="col-sm-2 control-label" for="presetInput">Preset</label>
+				                    <div class="input-group col-sm-10">
+				                        	<select type="text" class="form-control" id="presetInput"></select>
+				                    	<span class="input-group-btn">
+	 										<button id class="btn btn-primary" type="button" tabindex="-1"> Go! </button>
+	 									</span>
+				                    </div>
+		                 		</div>
+	              			</fieldset>
+	              		</div>
+
+	              		<div class="container-fluid settingsPaneItem">
+	              			<ul class="nav-pills">
+	              				<li><a href='#tab-general'>General</a></li>
+	              				<li><a href='#tab-appearance'>Appearance</a></li>
+	              				<li><a href='#tab-training'>Training</a></li>
+	              				<li><a href='#tab-language'>Language</a></li>
+	              			</ul>
+	              			<div class="tab-pane active" id="tab-general">
+	              			</div>
+	              			<div class="tab-pane" id="tab-appearance">
+	              			</div>
+	              			<div class="tab-pane" id="tab-training">
+	              			</div>
+	              			<div class="tab-pane" id="tab-language">
+	              			</div>
+	              		</div>
 					</div>
 					<div class="modal-footer">
 						<a id="initExitButton" href="#" class="btn">Exit</a>
-						<a id="configureDefaultSettingsButton" href="#" class="btn btn-primary">Configure Default Settings</a>
+						<a id="configureDefaultSettingsButton" href="#" class="btn btn-primary ridInputPaneItem">Choose Settings</a>
+						<a id="manualSettingsEntryButton" href="#" class="btn btn-secondary presetPaneItem">Enter Settings Manually</a>
+						<a id="beginSessionButton" href="#" class="btn btn-primary settingsPaneItem"> Begin Session! </a>
 					</div>
 				</div>
 			</div>
