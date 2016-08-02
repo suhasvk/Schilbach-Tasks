@@ -1,40 +1,10 @@
-// HeartsAndFlowersGame.js
+// HeartsAndFlowersTask.js
 // Suhas Vijaykumar, July 2016
 
-rand = function(min,max){
-	return min + (max-min)*Math.random();
-}
-
-randomConditionList = function(length){
-	var conditionList = []
-	for (var k = 0; k < length; k++){
-		var conditionNumber = Math.floor(rand(0,4));
-		var condition;
-		switch (conditionNumber){
-			case 0:
-				conditionList.push(CONDITION_HEART_LEFT);
-				break;
-			case 1:
-				conditionList.push(CONDITION_HEART_RIGHT);
-				break;
-			case 2:
-				conditionList.push(CONDITION_FLOWER_LEFT);
-				break;
-			case 3: 
-				conditionList.push(CONDITION_FLOWER_RIGHT);
-				break;
-		}
-	}
-	return conditionList;
-}
-
-HeartsAndFlowersTask = function(opts){
+HeartsAndFlowersTask = function(ID,opts){
 
 	// This is the duration each stimulus is displayed
 	this.appearanceTime = opts.appearanceTime;
-
-	// This is the amount of time which passes after the game starts, before the first stimulus appears
-	this.waitTime = opts.waitTime;
 
 	// The number of stimuli to display
 	this.numberOfConditions = opts.numberOfConditions;
@@ -43,69 +13,77 @@ HeartsAndFlowersTask = function(opts){
 	// [not implemented]
 	this.displayTimer = opts.displayTimer;
 
-	this.itervals = []
-	for (var n = 0; n < numberOfConditions; n++){
+	// The intervals between stimuli
+	this.itervals = [opts.waitTime]
+	for (var n = 1; n < numberOfConditions; n++){
 		this.intervalList.push(rand(opts.isi.min,opts.isi.max))
 	}
 	this.conditionList = randomConditionList(numberOfConditions);
 
-	this.conditionNumber = -1;
+	this.conditionIndex = -1;
 
 	// These are for logging game info
 	this.results = [];
 	this.gameData = {
-		// Stuff
-	}
-	this.running? = false;
-
-	this.getStartTime = function(){
-		return this.startTime;
+		"ID": ID,
+		"opts": opts,
+		"conditions": conditionList,
+		"intervals": intervals
 	}
 
-	this.isCompatible = function(inpt, condition){
+	this.isRunning = false;
+
+	this.isCorrect = function(inpt, condition){
 		return (((inpt == 'R') && (condition == 'HR' || condition == 'FL')) 
 			|| ((inpt == 'L') && (condition == 'HL' || condition == 'FR')));
 	}
 
-
-	this.logMove = function(data){
-		this.results.push({
-			"type": "INPUT",
-			"time": data.time,
-			"direction": data.input,
-			"condition": data.condition,
-			"correct?": this.isCompatible(data.input, data.condition);
-		});
+	this.log = function(data){
+		this.results.push(data);
 	}
 
-	this.logDisplay = function(data){
-		this.results.push({
-			"type": "OUTPUT",
-			"time": data.time,
-			"condition": data.condition
-		});
+	this.begin = function(){
+		if (this.conditionIndex == -1){
+			this.update();
+			this.running = true;
+		}
+
+		else {
+			console.log("Erraneous HeartsAndFlowersTask.begin() call.");
+		}
 	}
 
-	this.startTask = function(){
-		this.conditionNumber = 0;
-		this.running = true;
-		this.dispatchEvent('start',{
-			"number": this.conditionNumber,
-			"newCondition": this.conditionList[this.conditionNumber],
-		})
-
+	this.recordResults = function(){
+		// This is for debugging purposes. In the final version this will be written to a database.
+		alert(this.gameData);
+		alert(this.results);
 	}
 
-	this.makeMove = function(data){
-		this.conditionNumber++;
-		this.dispatchEvent('move',{
-			"number": this.conditionNumber,
-			"newCondition": this.conditionList[this.conditionNumber],
+	this.end = function(){
+		this.running = false;
+		this.recordResults();
+	}
+
+	this.update = function(){
+		this.conditionIndex++; 
+
+		if (this.conditionIndex == this.numberOfConditions) {
+			this.dispatchEvent(EVENT_GAME_END, {
+				"complete": true
+			});
+			this.end();
+		}
+
+
+		this.dispatchEvent(EVENT_TASK_INPUT,{
+			"number": this.conditionIndex + 1,
+			"wait": this.intervals[this.conditionIndex],
+			"newCondition": this.conditionList[this.conditionIndex]
 		});
 	}
 
 	this.getCondition = function(){
-		return conditionList[conditionNumber];
+		return conditionList[conditionIndex];
 	}
 
 	////////////////////////////

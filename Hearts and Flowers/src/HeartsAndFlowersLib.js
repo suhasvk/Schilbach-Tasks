@@ -10,10 +10,46 @@ CONDITION_FLOWER_RIGHT = 'FR';
 INPUT_LEFT = 'L';
 INPUT_RIGHT = 'R';
 
-// D.O.M. identifiers
-HEART_LEFT_ID = 'heartLeft';
-FLOWER_LEFT_ID = 'flowerLeft';
-HEART_RIGHT_ID = 'heartRight';
-FLOWER_RIGHT_ID = 'flowerRight';
+// jQuery selectors
+HEART_LEFT_SELECTOR = '#heartLeft';
+FLOWER_LEFT_SELECTOR = '#flowerLeft';
+HEART_RIGHT_SELECTOR = '#heartRight';
+FLOWER_RIGHT_SELECTOR = '#flowerRight';
+ALL_STIMULI_SELECTOR = '.stimulus';
 
+GAME_START_BUTTON_SELECTOR = "#gameStartButton";
 
+RIGHT_GAME_PANE_SELECTOR = '#game-right';
+LEFT_GAME_PANE_SELECTOR = '#game-left';
+
+// Event names
+EVENT_TASK_START = 'start';
+EVENT_TASK_END = 'end';
+EVENT_TASK_INPUT = 'input';
+
+// Utility functions
+rand = function(min,max){
+	return min + (max-min)*Math.random();
+}
+
+randomConditionList = function(length){
+	var conditionList = []
+	for (var k = 0; k < length; k++){
+		var z = Math.floor(rand(0,4));
+		switch (z){
+			case 0:
+				conditionList.push(CONDITION_HEART_LEFT);
+				break;
+			case 1:
+				conditionList.push(CONDITION_HEART_RIGHT);
+				break;
+			case 2:
+				conditionList.push(CONDITION_FLOWER_LEFT);
+				break;
+			case 3: 
+				conditionList.push(CONDITION_FLOWER_RIGHT);
+				break;
+		}
+	}
+	return conditionList;
+}

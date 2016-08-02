@@ -1,43 +1,54 @@
 <!-- main.html -->
 <head>
 	<script src="lib/jquery.min.js"></script>
+	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 	<script src="src/HeartsAndFlowersLib.js"/></script>
 	<script src="src/HeartsAndFlowersModel.js"/></script>
 	<script src="src/HeartsAndFlowersController.js"/></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
 	<link rel="stylesheet" type="text/css" href="HeartsAndFlowers.css"/>
+	<script>
+
+		$(document).ready(function{
+			console.log("I'm here!");
+		});
+	</script>
 </head>
 <body>
-	<div class="center" id="gameArea" width="100%">
+	<!-- Modal -->
+	<div id="taskModal" class="modal fade hide" role="dialog">
+		<div class="modal-dialog">
 
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Begin Task</h4>
+				</div>
+				<div class="modal-body">
+<!-- 					<h4> Enter P.I.D. to begin task. </h4> -->
+				<div id="pidInputGroup" class="form-group">
+					<label for="pidInput"> P.I.D.</label>
+					<input type="number" class="form-control" id="pidInput" placeholder="Enter subject's P.I.D. here."></input>
+					<div class="form-control-feedback hidden">Invalid P.I.D.</div>
+					<small class="form-text text-muted">The subject's four-digit P.I.D. is required to begin the task.</small>
+				</div>	
+				</div>
+				<div class="modal-footer">
+				<button id="startButton" type="button" class="btn btn-default" data-dismiss="modal">Begin!</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="center" id="gameArea" width="100%">
 		<!-- Game content -->
-		<div id="leftContainer" class="left-half">
+		<div id="game-left" class="left-half">
 			<img class="stimulus" id="heartLeft" src="img/hearts.svg"/>
 			<img class="stimulus" id="flowerLeft" src="img/flower.svg"/>
 		</div>
-		<div class="right-half">
+		<div id="game-right" class="right-half">
 			<img class="stimulus" id="heartRight" src="img/hearts.svg"/>
 			<img class="stimulus" id="flowerRight" src="img/flower.svg"/>
 		</div>
 
-		<!-- Instructions panels -->
-		<div class="both-halves blue instructions" id="mainHelp">
-			<div class="instructions-text"><h1>Poop!</h1> </div>
-		</div>
-
-		<div class="left-half green instructions" id="leftCorrectHelp">
-			<h1 class="instructions-text">Good :)</h1>
-		</div>
-
-		<div class="left-half red instructions" id="leftIncorrectHelp">
-			  <h1 class="instructions-text"> Bad :(</h1> 
-		</div>
-
-		<div class="right-half green instructions" id="rightCorrectHelp">
-			 <h1 class="instructions-text">Good :)</h1>
-		</div>
-
-		<div class="right-half red instructions" id="rightIncorrectHelp">
-			 <h1 class="instructions-text"> Bad :(</h1> 
-		</div>
-	</div>
 </body>
