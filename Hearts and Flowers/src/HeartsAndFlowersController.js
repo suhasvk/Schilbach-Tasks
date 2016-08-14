@@ -4,91 +4,94 @@
 function HeartsAndFlowersController(hfGame) {
 
 	this.game = hfGame;
-	this.appearanceTimer = null;
+	var appearanceTimer = null;
+	var controller = this;
 
-	this.setDisplayCondition = function setDisplayCondition(data){
-		setTimeout(function(){
-			switch(data.newCondition){
-				case CONDITION_HEART_LEFT:
-					console.log('poop');
-					$(HEART_LEFT_SELECTOR).show();
-					break;
-				case CONDITION_HEART_RIGHT:
-					$(HEART_RIGHT_SELECTOR).show();
-					break;
-				case CONDITION_FLOWER_LEFT:
-					$(FLOWER_LEFT_SELECTOR).show();
-					break;
-				case CONDITION_FLOWER_RIGHT:
-					$(FLOWER_RIGHT_SELECTOR).show();
-					break;
-				default:
-					console.log('INVALID INPUT IN "HeartsAndFlowersController.setDisplayCondition": ' + data.newCondition);
-					break;
-			}
-			this.game.log({
-				"type": "DISPLAY"
-				"time": performance.now(),
-				"condition": data.newCondition,
-				"conditionNumber": data.number
-			});
-		}, data.wait);
+	this.setDisplayCondition = function(data){
+		if (controller.game.isRunning) {
+			setTimeout(function(){
+				switch(data.newCondition){
+					case CONDITION_HEART_LEFT:
+						$(HEART_LEFT_SELECTOR).show();
+						break;
+					case CONDITION_HEART_RIGHT:
+						$(HEART_RIGHT_SELECTOR).show();
+						break;
+					case CONDITION_FLOWER_LEFT:
+						$(FLOWER_LEFT_SELECTOR).show();
+						break;
+					case CONDITION_FLOWER_RIGHT:
+						$(FLOWER_RIGHT_SELECTOR).show();
+						break;
+					default:
+						console.log('INVALID INPUT IN "HeartsAndFlowersController.setDisplayCondition": ' + data.newCondition);
+						break;
+				}
+				this.game.log({
+					"type": "DISPLAY",
+					"time": performance.now(),
+					"condition": data.newCondition,
+					"conditionNumber": data.number
+				});
 
-		this.appearanceTimer = setTimeout(function() {
-			$(ALL_STIMULI_SELECTOR).hide();
-			this.game.update()
-		}, this.game.appearanceTime);
-	}
+				appearanceTimer = setTimeout(function() {
+						$(ALL_STIMULI_SELECTOR).hide();
+						controller.game.update();
+				}, controller.game.appearanceTime);
+			}, data.wait);
+		}
+	};
 
 	this.registerGameInput = function(input){
-		this.game.log({
+		controller.game.log({
 			"type": "INPUT",
 			"time": performance.now(),
 			"input": input,
 			"isCorrect": this.game.isCorrect(input, this.game.getCondition())
 		});
-
-		// The following lines make the current stimulus disappear and immediately begin the next isi upon input
-
-		// clearTimeout(this.appearanceTimer);
-		// $(ALL_STIMULI_SELECTOR).hide();
-		// makeMove()
 	}
 
 	////////////////////////
 	// Model event listeners
 	// 
 	this.game.addEventListener(EVENT_TASK_INPUT, function(data){
-		this.setDisplayCondition({
+		controller.setDisplayCondition({
 			"number": data.number,
 			"wait": data.wait,
 			"newCondition": data.newCondition
 		});
 	});
 
+	this.game.addEventListener(EVENT_TASK_END, function(data){
+		$(ALL_STIMULI_SELECTOR).css('display','none');
+	});
+
 	////////////////////////
 	// Model manipulation
 	// 
 
+	$(GAME_START_BUTTON_SELECTOR).click(function(evt,err){
+		$(BEGIN_MODAL).modal('dismiss');
+		controller.game.begin()
+	});
 
-
-	// During game inputs
-	
+	// Inputs during game
 	$(LEFT_GAME_PANE_SELECTOR).click(function(evt,err){
-		this.registerGameInput(INPUT_LEFT);
+		controller.registerGameInput(INPUT_LEFT);
 	});
 
 	$(RIGHT_GAME_PANE_SELECTOR).click(function(evt,err){
-		this.registerGameInput(INPUT_RIGHT);
+		controller.registerGameInput(INPUT_RIGHT);
 	});
 
-	$(window).keypress(function(evt,err){
+	$(window).keydown(function(evt,err){
+		evt.preventDefault();
 		switch(evt.keyCode){
 			case 37:
-				this.registerGameInput(INPUT_LEFT);
+				controller.registerGameInput(INPUT_LEFT);
 				break;
 			case 39:
-				this.registerGameInput(INPUT_RIGHT);
+				controller.registerGameInput(INPUT_RIGHT);
 				break;
 		}
 	});

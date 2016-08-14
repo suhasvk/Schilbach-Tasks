@@ -1,22 +1,60 @@
 <!-- main.html -->
 <head>
-	<script src="lib/jquery.min.js"></script>
+	<script src="lib/jquery/jquery.min.js"></script>
 	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 	<script src="src/HeartsAndFlowersLib.js"/></script>
 	<script src="src/HeartsAndFlowersModel.js"/></script>
 	<script src="src/HeartsAndFlowersController.js"/></script>
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.css"/>
 	<link rel="stylesheet" type="text/css" href="HeartsAndFlowers.css"/>
 	<script>
 
-		$(document).ready(function{
-			console.log("I'm here!");
+		togglePidWarning = function(){
+			$('#pidGroup').toggleClass("has-error has-feedback").find('.form-control-feedback, .help-block').toggleClass('hidden');
+
+		}
+		$(document).ready(function(){
+
+			$(BEGIN_TASK_MODAL_SELECTOR).modal('show');
+			
+			$(GAME_START_BUTTON_SELECTOR).click(function(evt,err){
+				var pid = parseInt($('#pidInput').val());
+				console.log(pid)
+
+				if (!(1000 <= pid && pid <= 9999)) {
+					$('#pidGroup').addClass("has-error has-feedback").find('.form-control-feedback, .help-block').removeClass('hidden');
+				}
+				else {
+					$('#pidGroup').removeClass("has-error has-feedback").find('.form-control-feedback, .help-block').addClass('hidden');
+
+					$(BEGIN_TASK_MODAL_SELECTOR).modal('hide');
+
+					game = new HeartsAndFlowersTask(pid, {
+						appearanceTime: 3000,
+						numberOfConditions: 3,
+						waitTime: 1000,
+						isi: {
+							min: 3000,
+							max: 5000
+						},
+						stimuli: {
+							heart: 'img/hearts.svg',
+							flower: 'img/flower.svg'
+						}
+					});
+
+					console.log(game); //debug
+					controller = new HeartsAndFlowersController(game);
+
+					game.begin();
+				}
+			});
 		});
 	</script>
 </head>
 <body>
 	<!-- Modal -->
-	<div id="taskModal" class="modal fade hide" role="dialog">
+	<div id="beginTaskModal" class="modal fade" role="dialog">
 		<div class="modal-dialog">
 
 			<!-- Modal content-->
@@ -27,15 +65,16 @@
 				</div>
 				<div class="modal-body">
 <!-- 					<h4> Enter P.I.D. to begin task. </h4> -->
-				<div id="pidInputGroup" class="form-group">
-					<label for="pidInput"> P.I.D.</label>
+				<div id="pidGroup" class="form-group">
+					<label class="control-label" for="pidInput"> P.I.D.</label>
 					<input type="number" class="form-control" id="pidInput" placeholder="Enter subject's P.I.D. here."></input>
-					<div class="form-control-feedback hidden">Invalid P.I.D.</div>
+					<span id="pidInvalidNotice" class="glyphicon glyphicon-remove form-control-feedback hidden"></span>
+					<div class="help-block hidden">Invalid P.I.D.</div>
 					<small class="form-text text-muted">The subject's four-digit P.I.D. is required to begin the task.</small>
-				</div>	
 				</div>
+			</div>
 				<div class="modal-footer">
-				<button id="startButton" type="button" class="btn btn-default" data-dismiss="modal">Begin!</button>
+				<button id="gameStartButton" type="button" class="btn btn-primary">Begin!</button>
 				</div>
 			</div>
 		</div>
@@ -43,12 +82,12 @@
 	<div class="center" id="gameArea" width="100%">
 		<!-- Game content -->
 		<div id="game-left" class="left-half">
-			<img class="stimulus" id="heartLeft" src="img/hearts.svg"/>
-			<img class="stimulus" id="flowerLeft" src="img/flower.svg"/>
+			<img class="stimulus heart" id="heartLeft" src="img/hearts.svg"/>
+			<img class="stimulus flower" id="flowerLeft" src="img/flower.svg"/>
 		</div>
 		<div id="game-right" class="right-half">
-			<img class="stimulus" id="heartRight" src="img/hearts.svg"/>
-			<img class="stimulus" id="flowerRight" src="img/flower.svg"/>
+			<img class="stimulus heart" id="heartRight" src="img/hearts.svg"/>
+			<img class="stimulus flower" id="flowerRight" src="img/flower.svg"/>
 		</div>
 
 </body>

@@ -2,6 +2,9 @@
 // Suhas Vijaykumar, July 2016
 
 HeartsAndFlowersTask = function(ID,opts){
+	console.log('building')
+
+	var task = this;
 
 	// This is the duration each stimulus is displayed
 	this.appearanceTime = opts.appearanceTime;
@@ -11,14 +14,16 @@ HeartsAndFlowersTask = function(ID,opts){
 
 	// Whether or not to display a timer (for debugging / verification purposes)
 	// [not implemented]
-	this.displayTimer = opts.displayTimer;
+	// this.displayTimer = opts.displayTimer;
 
 	// The intervals between stimuli
-	this.itervals = [opts.waitTime]
-	for (var n = 1; n < numberOfConditions; n++){
-		this.intervalList.push(rand(opts.isi.min,opts.isi.max))
+	this.intervals = [opts.waitTime]
+
+	for (var n = 1; n < this.numberOfConditions; n++){
+		this.intervals.push(rand(opts.isi.min,opts.isi.max))
 	}
-	this.conditionList = randomConditionList(numberOfConditions);
+
+	this.conditionList = randomConditionList(this.numberOfConditions);
 
 	this.conditionIndex = -1;
 
@@ -27,8 +32,8 @@ HeartsAndFlowersTask = function(ID,opts){
 	this.gameData = {
 		"ID": ID,
 		"opts": opts,
-		"conditions": conditionList,
-		"intervals": intervals
+		"conditions": this.conditionList,
+		"intervals": this.intervals
 	}
 
 	this.isRunning = false;
@@ -39,13 +44,13 @@ HeartsAndFlowersTask = function(ID,opts){
 	}
 
 	this.log = function(data){
-		this.results.push(data);
+		task.results.push(data);
 	}
 
 	this.begin = function(){
-		if (this.conditionIndex == -1){
-			this.update();
-			this.running = true;
+		if (task.conditionIndex == -1){
+			task.isRunning = true;
+			task.update();
 		}
 
 		else {
@@ -55,35 +60,47 @@ HeartsAndFlowersTask = function(ID,opts){
 
 	this.recordResults = function(){
 		// This is for debugging purposes. In the final version this will be written to a database.
-		alert(this.gameData);
-		alert(this.results);
+		console.log(task.gameData);
+		console.log(task.results);
+
 	}
 
-	this.end = function(){
-		this.running = false;
-		this.recordResults();
-	}
-
-	this.update = function(){
-		this.conditionIndex++; 
-
-		if (this.conditionIndex == this.numberOfConditions) {
-			this.dispatchEvent(EVENT_GAME_END, {
-				"complete": true
-			});
-			this.end();
-		}
-
-
-		this.dispatchEvent(EVENT_TASK_INPUT,{
-			"number": this.conditionIndex + 1,
-			"wait": this.intervals[this.conditionIndex],
-			"newCondition": this.conditionList[this.conditionIndex]
+	this.end = function(isComplete){
+		task.isRunning = false;
+		task.recordResults();
+		task.dispatchEvent(EVENT_TASK_END, {
+			"complete": isComplete
 		});
 	}
 
+	this.update = function(){
+		task.conditionIndex++; 
+
+		if (task.conditionIndex == task.numberOfConditions) {
+			console.log('donezo');
+			task.end(true);
+		}
+
+		else if (task.conditionIndex < task.numberOfConditions) {
+			console.log('poopcop')
+			task.dispatchEvent(EVENT_TASK_INPUT,{
+				"number": task.conditionIndex + 1,
+				"wait": task.getInterval(),
+				"newCondition": task.getCondition()
+			});
+		}
+
+		else {
+			console.log('Erroneous late HeartsAndFlowersTask.udpate() call. Call number: '+toString(task.conditionIndex)+', Number of conditions: '+toString(task.numberOfConditions));
+		}
+	}
+
 	this.getCondition = function(){
-		return conditionList[conditionIndex];
+		return this.conditionList[this.conditionIndex];
+	}
+
+	this.getInterval = function(){
+		return this.intervals[this.conditionIndex];
 	}
 
 	////////////////////////////
@@ -96,7 +113,7 @@ HeartsAndFlowersTask = function(ID,opts){
 	 * Dispatch a new event to all the event listeners of a given event type
 	 */
 	this.dispatchEvent = function(type, details){
-		var newEvent = new BoardEvent(type, details);
+		var newEvent = details;
 
 		if (this.allHandlers[type]){
 			for (var i in this.allHandlers[type]){

@@ -17,10 +17,16 @@ HEART_RIGHT_SELECTOR = '#heartRight';
 FLOWER_RIGHT_SELECTOR = '#flowerRight';
 ALL_STIMULI_SELECTOR = '.stimulus';
 
+
 GAME_START_BUTTON_SELECTOR = "#gameStartButton";
+BEGIN_TASK_MODAL_SELECTOR = "#beginTaskModal";
+PID_INPUT_GROUP_SELECTOR = "#pidGroup";
 
 RIGHT_GAME_PANE_SELECTOR = '#game-right';
 LEFT_GAME_PANE_SELECTOR = '#game-left';
+
+HEART_STIMULI_SELECTOR = ".heart";
+FLOWER_STIMULI_SELECTOR = ".flower";
 
 // Event names
 EVENT_TASK_START = 'start';
