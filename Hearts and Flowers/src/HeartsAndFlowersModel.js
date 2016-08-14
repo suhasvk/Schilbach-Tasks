@@ -18,7 +18,6 @@ HeartsAndFlowersTask = function(ID,opts){
 
 	// The intervals between stimuli
 	this.intervals = [opts.waitTime]
-
 	for (var n = 1; n < this.numberOfConditions; n++){
 		this.intervals.push(rand(opts.isi.min,opts.isi.max))
 	}
@@ -58,16 +57,94 @@ HeartsAndFlowersTask = function(ID,opts){
 		}
 	}
 
-	this.recordResults = function(){
-		// This is for debugging purposes. In the final version this will be written to a database.
-		console.log(task.gameData);
-		console.log(task.results);
+	this.processResponses = function(log){
+		var isLooking = false;
+		var stimulusTime;
+		var condition;
+		var processedResults = [];
 
+		for (var k = 0; k < log.length; k++){
+			var data = log[k];
+			if (data.type == "DISPLAY"){
+				if (isLooking) {
+					var summary = {
+						time: Infinity,
+						condition: condition,
+						correct: false
+					};
+					processedResults.push(summary);
+				}
+				isLooking = true;
+				stimulusTime = data.time;
+				condition = data.condition;
+			}
+			else if (isLooking && (data.time - MIN_BUFFER_TIME > stimulusTime) && (data.type == "INPUT")) {
+				isLooking = false;
+				var summary = {
+					time: (data.time - stimulusTime),
+					condition: condition,
+					correct: data.isCorrect
+				}
+				processedResults.push(summary);
+			}
+		}
+		return processedResults;
+	}
+
+	this.createSummary = function(processedResults){
+		var flowerTotal = 0;
+		var heartTotal = 0;
+		var flowerCorrect = 0;
+		var heartCorrect = 0;
+		var heartAverage = 0;
+		var flowerAverage = 0;
+
+		for (var k = 0; k < processedResults.length; k++) {
+			var result = processedResults[k];
+			if (result.condition[0] === "H") {
+				heartTotal++;
+				if (result.correct) {
+					heartCorrect++;
+					heartAverage = heartAverage*(heartTotal-1)/heartTotal + result.time/heartTotal;
+				}
+			}
+			else if (result.condition[0] === "F") {
+				flowerTotal++;
+				if (result.correct) {
+					flowerCorrect++;
+					flowerAverage = flowerAverage*(flowerTotal-1)/flowerTotal + result.time/flowerTotal;
+				}
+			}
+		}
+
+		var totalCorrect = flowerCorrect + heartCorrect;
+		var averageTime = (flowerAverage*flowerCorrect + heartAverage*heartCorrect)/totalCorrect;
+
+		return {
+			flowerTotal: flowerTotal,
+			heartTotal: heartTotal,
+			flowerCorrect: flowerCorrect,
+			heartCorrect: heartCorrect,
+			flowerAverage: flowerAverage,
+			heartAverage: heartAverage,
+			totalCorrect: totalCorrect,
+			totalStimuli: flowerTotal + heartTotal,
+			averageTime: averageTime,
+			score: SCORE_FUNC(averageTime)*totalCorrect
+		};
+	}
+
+	this.rawResults = function(){
+		// This is for debugging purposes. In the final version this will be written to a database.
+		return task.results;
+	}
+
+	this.resultsSummary = function(){
+		return task.createSummary(task.processResponses(task.results));
 	}
 
 	this.end = function(isComplete){
 		task.isRunning = false;
-		task.recordResults();
 		task.dispatchEvent(EVENT_TASK_END, {
 			"complete": isComplete
 		});
@@ -77,12 +154,10 @@ HeartsAndFlowersTask = function(ID,opts){
 		task.conditionIndex++; 
 
 		if (task.conditionIndex == task.numberOfConditions) {
-			console.log('donezo');
 			task.end(true);
 		}
 
 		else if (task.conditionIndex < task.numberOfConditions) {
-			console.log('poopcop')
 			task.dispatchEvent(EVENT_TASK_INPUT,{
 				"number": task.conditionIndex + 1,
 				"wait": task.getInterval(),
