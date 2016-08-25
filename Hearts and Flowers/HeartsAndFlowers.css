@@ -30,7 +30,23 @@
 		#E6E6E6 100%
 	);
 	border: 5px solid #000000;
+	-webkit-transition: border 1000ms linear;
+	-moz-transition: border 1000ms linear;
+	-o-transition: border 1000ms linear;
+	-ms-transition: border 1000ms linear;
+	transition: border 1000ms linear;
 }
+
+#gameArea.demo {
+	border: 5px solid #1B5F92;
+	-webkit-transition: border 1000ms linear;
+	-moz-transition: border 1000ms linear;
+	-o-transition: border 1000ms linear;
+	-ms-transition: border 1000ms linear;
+	transition: border 1000ms linear;
+}
+
+
 
 .left-half {
 	display: table-cell;
@@ -57,35 +73,72 @@
 	height: 100%;
 }
 
-.red {
-	background-color: #D74746;
+.blocked {
+   color: #c2c2c2 !important; /* The important overrides the settings from bootstrap */
+   cursor: not-allowed;
 }
 
-.green {
-	background-color: #1D9300;
+.pane {
+	padding: 1em;
+	background: rgba(255,255,255,0);
 }
 
-.blue {
-	background-color: #1E22E1;
-}
-
-.black {
-	background-color: #000;
-}
-
-
-.instructions {
+.blue-fill {
 	/*Opacity*/
 	opacity: 0;
-	text-align: center;
+	-webkit-transition: opacity 1000ms ease;
+	-moz-transition: opacity 1000ms ease;
+	-o-transition: opacity 1000ms ease;
+	-ms-transition: opacity 1000ms ease;
+	transition: opacity 1000ms ease;
+
+	background: #1B5F92;
 }
 
-.instructions-text {
-	position: relative;
-	top: 100px;
-	margin: auto;
+.overlay-text {
+	font-size: 2em;
 	color: white;
-	line-height: normal; 
+	text-align: left;
+}
+
+.instructions {
+	opacity: 0;
+	-webkit-transition: opacity 1000ms ease;
+	-moz-transition: opacity 1000ms ease;
+	-o-transition: opacity 1000ms ease;
+	-ms-transition: opacity 1000ms ease;
+	transition: opacity 1000ms ease;
+}
+
+.instructions.show {
+	opacity: 100;
+	-webkit-transition: opacity 1000ms ease;
+	-moz-transition: opacity 1000ms ease;
+	-o-transition: opacity 1000ms ease;
+	-ms-transition: opacity 1000ms ease;
+	transition: opacity 1000ms ease;
+}
+
+img {
+	opacity: inherit;
+}
+
+.signal {
+	color: inherit;
+	-webkit-transition: opacity 250ms ease-out;
+	-moz-transition: opacity 250ms ease-out;
+	-o-transition: opacity 250ms ease-out;
+	-ms-transition: opacity 250ms ease-out;
+	transition: opacity 250ms ease-out;
+}
+
+.signal.flash {
+	color: #1B5F92;
+	-webkit-transition: opacity 250ms ease-in;
+	-moz-transition: opacity 250ms ease-in;
+	-o-transition: opacity 250ms ease-in;
+	-ms-transition: opacity 250ms ease-in;
+	transition: opacity 250ms ease-in;
 }
 
 .stimulus {

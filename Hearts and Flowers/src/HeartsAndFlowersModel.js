@@ -2,7 +2,6 @@
 // Suhas Vijaykumar, July 2016
 
 HeartsAndFlowersTask = function(ID,opts){
-	console.log('building')
 
 	var task = this;
 
@@ -22,7 +21,7 @@ HeartsAndFlowersTask = function(ID,opts){
 		this.intervals.push(rand(opts.isi.min,opts.isi.max))
 	}
 
-	this.conditionList = randomConditionList(this.numberOfConditions);
+	this.conditionList = randomConditionList(this.numberOfConditions, opts.phase);
 
 	this.conditionIndex = -1;
 
@@ -88,6 +87,16 @@ HeartsAndFlowersTask = function(ID,opts){
 				processedResults.push(summary);
 			}
 		}
+
+		if (isLooking) {
+			var summary = {
+				time: Infinity,
+				condition: condition,
+				correct: false
+			};
+			processedResults.push(summary);
+		}
+
 		return processedResults;
 	}
 
@@ -146,7 +155,9 @@ HeartsAndFlowersTask = function(ID,opts){
 	this.end = function(isComplete){
 		task.isRunning = false;
 		task.dispatchEvent(EVENT_TASK_END, {
-			"complete": isComplete
+			"complete": isComplete,
+			"resultsSummary": task.resultsSummary(),
+			"resultsRaw": task.rawResults()
 		});
 	}
 

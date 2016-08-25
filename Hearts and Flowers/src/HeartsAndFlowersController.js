@@ -4,58 +4,501 @@
 function HeartsAndFlowersController(opts) {
 
 	this.opts = opts;
+	console.log(opts);
 	var appearanceTimer = null;
 	var controller = this;
-	results = [];
+	var results = [];
 	var isFinalRound = false;
+	var phaseIndex = 0;
 
-	this.beginSequence = function(){
-		for (var i = 0; i < controler.opts.length; i++) {
-			var current_opts = controller.opts[i];
-			controller.game = HeartsAndFlowersTask(current_opts);
-			switch(i){
-				case 0:
-					controller.animateDescription();
-					controller.waitToBegin(practice=false);
-					controller.animateHeartsIntro();
-					controller.animateHeartsPractice();
-					break;
-				case 1:
-					controller.animateFlowersIntro();
-					controller.animateHeartsPractice();
-					break;
-				case 2: 
-					controller.animateBothIntro();
-					controller.animateBothPractice();
-					break;
-				case 3:
-					controle.waitToBegin(practice=false);
-					controller.animateHeartsIntro();
-					break;
-				case 4:
-					controller.animateFlowersIntro();
-					break;
-				case 5:
-					controller.animateBothIntro();
-					isFinalRound = true;
-					break;
-			}
-			controller.initialize(controller.game, i > 2);
-			controller.game.begin();
+	this.reset = function(){
+		isFinalRound = false;
+		controller.game = null;
+		controller.pid = null;
+		appearanceTimer = null;
+		phaseIndex = 0;
+		results = [];
+	}
+
+	this.recordResults = function(){
+		//TODO
+		return;
+	}
+
+	this.beginPhase = function(){
+		controller.game = new HeartsAndFlowersTask(controller.pid,controller.opts[phaseIndex]);
+		controller.initialize(controller.game, phaseIndex > 2);
+		switch(phaseIndex){
+			case 0:
+				setTimeout(function(){
+					controller.heartsIntro(controller.game,true,false);
+				}, 500);
+				break;
+			case 1:
+				setTimeout(function(){
+					controller.flowersIntro(controller.game,true,false);
+				}, 500);
+				break;
+			case 2: 
+				setTimeout(function(){
+					controller.bothIntro(controller.game,true,false);
+				}, 500);
+				break;
+			case 3:
+				setTimeout(function(){
+					controller.heartsIntro(controller.game,true,true);
+				}, 500);
+				break;
+			case 4:
+				setTimeout(function(){
+					controller.flowersIntro(controller.game,true,true);
+				}, 500);
+				break;
+			case 5:
+				setTimeout(function(){
+					controller.bothIntro(controller.game,true,true);
+				}, 500);
+				isFinalRound = true;
+				break;
 		}
 	};
 
-	this.animateDescription = function() {
-		console.log('animate description'); //debug
+	this.heartsIntro = function(game, isLong, isReal) {
+		$(INSTRUCTIONS_TEXT_AREA_SELECTOR)
+			.html((isReal ? '<p><strong>You are now being timed.</strong></p>' : '') + '<p> In the first section, <strong>hearts</strong> will appear on the screen. </p> <p> When a heart appears, press on the <strong>same side</strong> as the heart. </p>');
+			
+		$(INSTRUCTIONS_IMAGE_AREA_SELECTOR)
+			.append(
+				$(document.createElement('img'))
+					.attr('src',controller.opts[0].stimuli.heart)
+				);
+
+		$(ALL_INSTRUCTIONS_SELECTOR)
+			.toggleClass('show')
+
+
+		$(GAME_AREA_SELECTOR).toggleClass('demo');
+		var [l_ar, r_ar] = controller.makeControls();
+
+		if (isLong && !isReal){
+			setTimeout(function(){
+				$(ALL_INSTRUCTIONS_SELECTOR).toggleClass('show')
+			},8000)
+
+			setTimeout(function(){
+				$(l_ar).show();
+				$(r_ar).show();
+			},9000)
+
+			setTimeout(function(){
+				$(HEART_RIGHT_SELECTOR).show();
+			},11000)
+			
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(r_ar);
+				},12000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(HEART_RIGHT_SELECTOR).hide();
+			}, 15000);
+
+			setTimeout(function(){
+				$(HEART_LEFT_SELECTOR).show();
+			}, 16000);
+
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(l_ar);
+				},17000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(HEART_LEFT_SELECTOR).hide();
+				$(l_ar).hide().detach();
+				$(r_ar).hide().detach();
+			}, 20000);
+
+			setTimeout(function(){
+				$(ALL_INSTRUCTIONS_SELECTOR).toggleClass('show');	
+			}, 21000);
+
+			setTimeout(function(){
+				$(INSTRUCTIONS_TEXT_AREA_SELECTOR).append(
+					$(document.createElement('button'))
+						.addClass('btn')
+						.addClass('btn-danger')
+						.addClass('btn-lg')
+						.addClass('btn-block')
+						.text('Click here to '+(isReal?'begin':'practice')+'.')
+						.click(function(ev,er){
+							$(ALL_INSTRUCTIONS_SELECTOR)
+								.toggleClass('show')
+								.empty();
+							$(GAME_AREA_SELECTOR).toggleClass('demo');
+							setTimeout(function(){
+								game.begin();
+							}, 1000);
+						})
+				);
+			}, 22000);
+		} else {
+			$(INSTRUCTIONS_TEXT_AREA_SELECTOR).append(
+					$(document.createElement('button'))
+						.addClass('btn')
+						.addClass('btn-danger')
+						.addClass('btn-lg')
+						.addClass('btn-block')
+						.text('Click here to '+(isReal?'begin':'practice')+'.')
+						.click(function(ev,er){
+							$(ALL_INSTRUCTIONS_SELECTOR)
+								.toggleClass('show')
+								.empty();
+							$(GAME_AREA_SELECTOR).toggleClass('demo');
+							setTimeout(function(){
+								game.begin();
+							}, 1000);
+						})
+				);
+		}
 	};
 
-	this.waitToBegin = function() {
-		console.log('wait to begin'); //debug
+	this.flowersIntro = function(game, isLong, isReal) {
+
+		$(INSTRUCTIONS_TEXT_AREA_SELECTOR)
+			.html('<p> In the second section, <strong>flowers</strong> will appear on the screen. </p> <p> When a flower appears, press on the <strong>opposite side</strong> from the flower. </p>');
+			
+		$(INSTRUCTIONS_IMAGE_AREA_SELECTOR)
+			.append(
+				$(document.createElement('img'))
+					.attr('src',controller.opts[0].stimuli.flower)
+				);
+
+		$(ALL_INSTRUCTIONS_SELECTOR)
+			.toggleClass('show')
+
+		$(GAME_AREA_SELECTOR).toggleClass('demo');
+		var [l_ar, r_ar] = controller.makeControls();
+
+		if (isLong && !isReal){
+			setTimeout(function(){
+				$(ALL_INSTRUCTIONS_SELECTOR).toggleClass('show')
+			},8000)
+
+			setTimeout(function(){
+				$(l_ar).show();
+				$(r_ar).show();
+			},9000)
+
+			setTimeout(function(){
+				$(FLOWER_RIGHT_SELECTOR).show();
+			},11000)
+			
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(l_ar);
+				},12000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(FLOWER_RIGHT_SELECTOR).hide();
+			}, 15000);
+
+			setTimeout(function(){
+				$(FLOWER_LEFT_SELECTOR).show();
+			}, 16000);
+
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(r_ar);
+				},17000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(FLOWER_LEFT_SELECTOR).hide();
+				$(l_ar).hide().detach();
+				$(r_ar).hide().detach();
+			}, 20000);
+
+			setTimeout(function(){
+				$(ALL_INSTRUCTIONS_SELECTOR).toggleClass('show');	
+			}, 21000);
+
+			setTimeout(function(){
+				$(INSTRUCTIONS_TEXT_AREA_SELECTOR).append(
+					$(document.createElement('button'))
+						.addClass('btn')
+						.addClass('btn-danger')
+						.addClass('btn-lg')
+						.addClass('btn-block')
+						.text('Click here to '+(isReal?'begin':'practice')+'.')
+						.click(function(ev,er){
+							$(ALL_INSTRUCTIONS_SELECTOR)
+								.toggleClass('show')
+								.empty();
+							$(GAME_AREA_SELECTOR).toggleClass('demo');
+							setTimeout(function(){
+								game.begin();
+							}, 1000);
+						})
+				);
+			}, 22000);
+		} else {
+			$(INSTRUCTIONS_TEXT_AREA_SELECTOR).append(
+					$(document.createElement('button'))
+						.addClass('btn')
+						.addClass('btn-danger')
+						.addClass('btn-lg')
+						.addClass('btn-block')
+						.text('Click here to '+(isReal?'begin':'practice')+'.')
+						.click(function(ev,er){
+							$(ALL_INSTRUCTIONS_SELECTOR)
+								.toggleClass('show')
+								.empty();
+							$(GAME_AREA_SELECTOR).toggleClass('demo');
+							setTimeout(function(){
+								game.begin();
+							}, 1000);
+						})
+				);
+		}
 	};
 
-	this.animateHeartsIntro = function() {
-		console.log('hearts description'); //debug
+	this.bothIntro = function(game, isLong, isReal) {
+
+		$(INSTRUCTIONS_TEXT_AREA_SELECTOR)
+			.css('font-size','1.5em')
+			.html('<p> In the third section, <strong>both hearts and flowers</strong> will appear on the screen. </p><p> When a heart appears, press on the <strong>same side</strong> as the heart. </p><p> When a flower appears, press on the <strong>opposite side</strong> from the flower. </p>');
+			
+		$(INSTRUCTIONS_IMAGE_AREA_SELECTOR)
+			.append(
+				$(document.createElement('img'))
+					.attr('src',controller.opts[0].stimuli.heart)
+					.css('height','60%')
+					.css('width','60%')
+				)
+			.append(
+				$(document.createElement('img'))
+					.attr('src',controller.opts[0].stimuli.heart)
+					.css('height','40%')
+					.css('width','40%')
+					.css('opacity','0')
+				)
+			.append(
+				$(document.createElement('img'))
+					.attr('src',controller.opts[0].stimuli.flower)
+					.css('height','40%')
+					.css('width','40%')
+					.css('opacity','0')
+				)
+			.append(
+				$(document.createElement('img'))
+					.attr('src',controller.opts[0].stimuli.flower)
+					.css('height','60%')
+					.css('width','60%')
+					.css('position','relative')
+					.css('top','-20%')
+				);
+
+
+		$(ALL_INSTRUCTIONS_SELECTOR)
+			.toggleClass('show')
+
+		$(GAME_AREA_SELECTOR).toggleClass('demo');
+
+		var [l_ar, r_ar] = controller.makeControls();
+
+		if (isLong && !isReal){
+			setTimeout(function(){
+				$(ALL_INSTRUCTIONS_SELECTOR).toggleClass('show')
+			},8000)
+
+			setTimeout(function(){
+				$(l_ar).show();
+				$(r_ar).show();
+			},9000)
+
+			setTimeout(function(){
+				$(HEART_RIGHT_SELECTOR).show();
+			},11000)
+			
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(r_ar);
+				},12000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(HEART_RIGHT_SELECTOR).hide();
+			}, 15000);
+
+			setTimeout(function(){
+				$(HEART_LEFT_SELECTOR).show();
+			}, 16000);
+
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(l_ar);
+				},17000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(HEART_LEFT_SELECTOR).hide();
+			}, 20000);
+
+			setTimeout(function(){
+				$(FLOWER_RIGHT_SELECTOR).show();
+			}, 21000)
+			
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(l_ar);
+				},22000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(FLOWER_RIGHT_SELECTOR).hide();
+			}, 25000);
+
+			setTimeout(function(){
+				$(FLOWER_LEFT_SELECTOR).show();
+			}, 26000);
+
+			for (var i = 0; i < 3; i++) {
+				setTimeout(function(){
+					controller.flashControl(r_ar);
+				},27000 + i * 1000)
+			};
+
+			setTimeout(function(){
+				$(FLOWER_LEFT_SELECTOR).hide();
+				$(l_ar).hide().detach();
+				$(r_ar).hide().detach();
+			}, 30000);
+
+			setTimeout(function(){
+				$(ALL_INSTRUCTIONS_SELECTOR).toggleClass('show');	
+			}, 31000);
+
+			setTimeout(function(){
+				$(INSTRUCTIONS_TEXT_AREA_SELECTOR).append(
+					$(document.createElement('button'))
+						.addClass('btn')
+						.addClass('btn-danger')
+						.addClass('btn-lg')
+						.addClass('btn-block')
+						.text('Click here to '+(isReal?'begin':'practice')+'.')
+						.click(function(ev,er){
+							$(ALL_INSTRUCTIONS_SELECTOR)
+								.toggleClass('show')
+								.empty();
+							$(GAME_AREA_SELECTOR).toggleClass('demo');
+							setTimeout(function(){
+								game.begin();
+							}, 1000);
+						})
+				);
+			}, 32000);
+		} else {
+			$(INSTRUCTIONS_TEXT_AREA_SELECTOR).append(
+					$(document.createElement('button'))
+						.addClass('btn')
+						.addClass('btn-danger')
+						.addClass('btn-lg')
+						.addClass('btn-block')
+						.text('Click here to '+(isReal?'begin':'practice')+'.')
+						.click(function(ev,er){
+							$(ALL_INSTRUCTIONS_SELECTOR)
+								.toggleClass('show')
+								.empty();
+							$(GAME_AREA_SELECTOR).toggleClass('demo');
+							setTimeout(function(){
+								game.begin();
+							}, 1000);
+						})
+				);
+		}
 	};
+
+	this.makeControls = function(){
+		var leftArrow = $(document.createElement('span'))
+			.addClass('glyphicon')
+			.addClass('glyphicon-triangle-left')
+			.css('font-size','2.5em')
+			.get(0);
+
+		var rightArrow = $(document.createElement('span'))
+			.addClass('glyphicon')
+			.addClass('glyphicon-triangle-right')
+			.css('font-size','2.5em')
+			.get(0);
+
+		var height = $(GAME_AREA_SELECTOR).innerHeight();
+		var width = $(GAME_AREA_SELECTOR).outerWidth(true);
+		var mid_offset = $(RIGHT_GAME_PANE_SELECTOR).offset().left;
+		var bot_offset = $(RIGHT_GAME_PANE_SELECTOR).offset().top + height;
+
+		var l_xoff = mid_offset - width / 16;
+		var l_yoff =  bot_offset - height / 4;
+
+		var r_xoff = mid_offset + width / 16;
+		var r_yoff = bot_offset - height / 4;
+
+		$(rightArrow)
+			.appendTo(document.body)
+			.addClass('signal')
+			.css('position','absolute')
+			.offset({
+				top: r_yoff,
+				left: r_xoff
+			})
+			.hide();
+
+		$(leftArrow)
+			.appendTo(document.body)
+			.addClass('signal')
+			.css('position','absolute')
+			.offset({
+				top: l_yoff,
+				left: l_xoff - $(rightArrow).innerWidth() 
+			})
+			.hide();
+
+		$(window).resize(function(ev,er){
+			var height = $(GAME_AREA_SELECTOR).innerHeight();
+			var width = $(GAME_AREA_SELECTOR).outerWidth(true);
+			var mid_offset = $(RIGHT_GAME_PANE_SELECTOR).offset().left;
+			var bot_offset = $(RIGHT_GAME_PANE_SELECTOR).offset().top + height;
+
+			var l_xoff = mid_offset - width / 12;
+			var l_yoff =  bot_offset - height / 4;
+
+			var r_xoff = mid_offset + width / 12
+			var r_yoff = bot_offset - height / 4;
+			$(rightArrow).offset({
+				top: r_yoff,
+				left: r_xoff
+			});
+			$(leftArrow).offset({
+				top: l_yoff,
+				left: l_xoff - $(rightArrow).innerWidth() 
+			});
+		});
+
+		return [leftArrow, rightArrow];
+	};
+
+	this.flashControl = function(ar){
+		$(ar).toggleClass('flash');
+		setTimeout(function(){
+			$(ar).toggleClass('flash');
+		}, 300);
+	};
+
+	this.waitToBegin = function(a) {
+		return;
+	}
 
 	this.animateHeartsPractice = function() {
 		console.log('hearts animated description'); //debug
@@ -65,14 +508,19 @@ function HeartsAndFlowersController(opts) {
 		console.log('flowers description'); //debug
 	};
 
-	this.animateHeartsPractice = function() {
+	this.animateFlowersPractice = function() {
 		console.log('flowers animated description'); //debug
 	};
 
-	this.show
+	this.animateBothIntro = function() {
+		console.log('both description'); //debug
+	};
 
+	this.animateBothPractice = function() {
+		console.log('both animated description'); //debug
+	}
 
-	this.setDisplayCondition = function(data){
+	this.setDisplayCondition = function(data, override){
 		if (controller.game.isRunning) {
 			setTimeout(function(){
 				switch(data.newCondition){
@@ -92,7 +540,7 @@ function HeartsAndFlowersController(opts) {
 						console.log('INVALID INPUT IN "HeartsAndFlowersController.setDisplayCondition": ' + data.newCondition);
 						break;
 				}
-				this.game.log({
+				controller.game.log({
 					"type": "DISPLAY",
 					"time": performance.now(),
 					"condition": data.newCondition,
@@ -106,6 +554,26 @@ function HeartsAndFlowersController(opts) {
 			}, data.wait);
 		}
 	};
+
+	this.formatResults = function(results){
+		return {
+			'Hearts Only Round':{
+				'Fraction Correct': results[3].summary.totalCorrect + '/' + results[3].summary.totalStimuli,
+				'Avg. Correct Response Time': (results[3].summary.averageTime === NaN ? 'N/A' : results[3].summary.averageTime.toFixed(2) + ' milliseconds'),
+				'Score': results[3].summary.score.toFixed(2)
+			},
+			'Flowers Only Round':{
+				'Fraction Correct': results[4].summary.totalCorrect + '/' + results[4].summary.totalStimuli,
+				'Avg. Correct Response Time': (results[4].summary.averageTime === NaN ? 'N/A' : results[4].summary.averageTime.toFixed(2) + ' milliseconds'),
+				'Score': results[4].summary.score.toFixed(2)
+			},
+			'Final Round':{
+				'Fraction Correct': results[5].summary.totalCorrect + '/' + results[5].summary.totalStimuli,
+				'Avg. Correct Response Time': (results[5].summary.averageTime === NaN ? 'N/A' : results[5].summary.averageTime.toFixed(2) + ' milliseconds'),
+				'Score': results[5].summary.score.toFixed(2)
+			}
+		}
+	}
 
 	this.registerGameInput = function(input){
 		controller.game.log({
@@ -129,7 +597,24 @@ function HeartsAndFlowersController(opts) {
 		});
 		game.addEventListener(EVENT_TASK_END, function(data){
 			$(ALL_STIMULI_SELECTOR).css('display','none');
-			controller.results.append(data.resultsSummary);
+			results.push({
+				summary: data.resultsSummary,
+				raw: data.resultsRaw
+			});
+			if (phaseIndex < controller.opts.length - 1){
+				phaseIndex++;
+				controller.beginPhase();
+			}
+			else if (phaseIndex == controller.opts.length - 1){
+				controller.dispatchEvent(EVENT_END_SEQUENCE, {
+					resuts: results,
+					options: opts,
+					displayResults: controller.formatResults(results)
+				});
+			}
+			else {
+				console.log('ERROR phaseIndex = '+phaseIndex);
+			}
 		});
 	}
 
@@ -152,7 +637,6 @@ function HeartsAndFlowersController(opts) {
 	});
 
 	$(window).keydown(function(evt,err){
-		evt.preventDefault();
 		switch(evt.keyCode){
 			case 37:
 				controller.registerGameInput(INPUT_LEFT);
