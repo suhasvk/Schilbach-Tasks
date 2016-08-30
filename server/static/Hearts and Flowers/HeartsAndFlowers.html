@@ -1,0 +1,257 @@
+<!-- main.html -->
+<head>
+	<script src="lib/jquery/jquery.min.js"></script>
+	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="src/HeartsAndFlowersLib.js"/></script>
+	<script src="src/HeartsAndFlowersModel.js"/></script>
+	<script src="src/HeartsAndFlowersController.js"/></script>
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.css"/>
+	<link rel="stylesheet" type="text/css" href="HeartsAndFlowers.css"/>
+
+	<script>
+		opts = [{
+			phase: 'HeartsPhase',
+			appearanceTime: 3000,
+			numberOfConditions: 3,
+			waitTime: 1000,
+			isi: {
+				min: 3000,
+				max: 5000
+			},
+			stimuli: {
+				heart: 'img/hearts.svg',
+				flower: 'img/flower.svg'
+			}
+		},
+		{
+			phase: 'FlowersPhase',
+			appearanceTime: 3000,
+			numberOfConditions: 3,
+			waitTime: 1000,
+			isi: {
+				min: 3000,
+				max: 5000
+			},
+			stimuli: {
+				heart: 'img/hearts.svg',
+				flower: 'img/flower.svg'
+			}
+		},
+		{
+			phase: 'BothPhase',
+			appearanceTime: 3000,
+			numberOfConditions: 6,
+			waitTime: 1000,
+			isi: {
+				min: 3000,
+				max: 5000
+			},
+			stimuli: {
+				heart: 'img/hearts.svg',
+				flower: 'img/flower.svg'
+			}
+		},
+		{
+			phase: 'HeartsPhase',
+			appearanceTime: 3000,
+			numberOfConditions: 5,
+			waitTime: 1000,
+			isi: {
+				min: 3000,
+				max: 5000
+			},
+			stimuli: {
+				heart: 'img/hearts.svg',
+				flower: 'img/flower.svg'
+			}
+		},
+		{
+			phase: 'FlowersPhase',
+			appearanceTime: 3000,
+			numberOfConditions: 5,
+			waitTime: 1000,
+			isi: {
+				min: 3000,
+				max: 5000
+			},
+			stimuli: {
+				heart: 'img/hearts.svg',
+				flower: 'img/flower.svg'
+			}
+		},
+		{
+			phase: 'BothPhase',
+			appearanceTime: 3000,
+			numberOfConditions: 10,
+			waitTime: 1000,
+			isi: {
+				min: 3000,
+				max: 5000
+			},
+			stimuli: {
+				heart: 'img/hearts.svg',
+				flower: 'img/flower.svg'
+			}
+		}];
+
+		hfc = new HeartsAndFlowersController(opts);
+		hfc.addEventListener(EVENT_END_SEQUENCE,function(data){
+			for (category in data.displayResults) {
+				var block = document.createElement('p');
+				$(block).append('<strong>'+category+'</strong>')
+				for (item in data.displayResults[category]) {
+					var line = item+': '+data.displayResults[category][item];
+					block.appendChild(document.createElement('br'));
+					block.appendChild(document.createTextNode(line));
+				}
+				$(RESULTS_AREA_SELECTOR).append(block);
+			}
+			$(END_TASK_MODAL_SELECTOR).modal('show');
+		});
+	</script>
+	<script>
+		isValidPid = function(pid){
+			return (1000 <= pid && pid <= 9999);
+		};
+
+		$(document).ready(function(){
+
+			$(BEGIN_TASK_MODAL_SELECTOR).modal('show');
+			
+			$(GAME_START_BUTTON_SELECTOR).click(function(evt,err){
+				var pid = Number($(PID_INPUT_SELECTOR).val());
+
+				if (!isValidPid(pid)) {
+					$(PID_INPUT_GROUP_SELECTOR).addClass("has-error has-feedback").find('.form-control-feedback, .help-block').removeClass('hidden');
+				}
+
+				else {
+					hfc.pid = pid;
+					$(BEGIN_TASK_MODAL_SELECTOR).modal('hide');
+					$(PID_INPUT_GROUP_SELECTOR).removeClass("has-error has-feedback").find('.form-control-feedback, .help-block').addClass('hidden');
+					$(PID_INPUT_SELECTOR).val([]);
+					hfc.beginPhase();
+				}
+			});
+
+			$(SUBMIT_RESULTS_BUTTON_SELECTOR).click(function(evt,err){
+				var pid_conf = Number($(PID_CONFIRMATION_INPUT_SELECTOR).val());
+
+				if ($(PID_CONFIRMATION_OVERRIDE_CHECKBOX_SELECTOR).is(":checked")){
+						if(isValidPid(pid_conf)){
+							hfc.pid = pid_conf;
+						} else {
+							$(PID_CONFIRMATION_GROUP_SELECTOR).find('.help-block').text('Invalid P.I.D.');
+						}
+				}
+
+				if (pid_conf != hfc.pid) {
+					$(PID_CONFIRMATION_GROUP_SELECTOR)
+						.addClass("has-error has-feedback")
+					.find('.form-control-feedback, .help-block')
+						.removeClass('hidden')
+					.parent().find('.input-group-addon')
+						.removeClass('blocked')
+					.parent().find(PID_CONFIRMATION_OVERRIDE_CHECKBOX_SELECTOR)
+						.prop('disabled',false);
+				}
+
+				else {
+					$(PID_CONFIRMATION_GROUP_SELECTOR).removeClass("has-error has-feedback").find('.form-control-feedback, .help-block').addClass('hidden');
+					hfc.reset();
+					$(END_TASK_MODAL_SELECTOR).modal('hide');
+					
+					$(PID_CONFIRMATION_INPUT_SELECTOR).val([]);
+					$(PID_CONFIRMATION_GROUP_SELECTOR)
+						.removeClass("has-error has-feedback")
+					.find('.form-control-feedback, .help-block')
+						.addClass('hidden')
+					.parent().find('.input-group-addon')
+						.addClass('blocked')
+					.parent().find(PID_CONFIRMATION_OVERRIDE_CHECKBOX_SELECTOR)
+						.prop('disabled',true);
+
+					$(RESULTS_AREA_SELECTOR).empty();
+					$(BEGIN_TASK_MODAL_SELECTOR).modal('show');
+				}
+			});
+			$(BEGIN_TASK_MODAL_SELECTOR).modal('show');
+		});
+	</script>
+</head>
+<body>
+	<!-- Begin Game Modal -->
+	<div id="beginTaskModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Begin Task</h4>
+				</div>
+				<div class="modal-body">
+				<div id="pidGroup" class="form-group">
+					<label class="control-label" for="pidInput"> P.I.D.</label>
+					<input type="number" class="form-control" id="pidInput" placeholder="Enter subject's P.I.D. here."></input>
+					<span class="glyphicon glyphicon-remove form-control-feedback hidden"></span>
+					<div class="help-block hidden">Invalid P.I.D.</div>
+					<small class="form-text text-muted">The subject's four-digit P.I.D. is required to begin the task.</small>
+				</div>
+			</div>
+				<div class="modal-footer">
+				<button id="gameStartButton" type="button" class="btn btn-primary">Begin</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- End Game Modal -->
+	<div id="endTaskModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Results Summary</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container">
+						<div id='resultsArea'class="col-xs-8">
+						</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<div id="pidConfirmationGroup" class="form-group">
+						<label class="control-label" for="pidInput">Confirm P.I.D.</label>
+						<div class="input-group">
+							<input type="number" class="form-control" id="pidConfirmationInput" placeholder="Enter subject's P.I.D. here."></input>
+							<span class="input-group-addon blocked">Override?</span>
+							<span class="input-group-addon blocked"><input id="pidConfirmOverride" type="checkbox" disabled></span>
+						</div>
+						<div class="help-block hidden">P.I.D. does not match.</div>
+						<small class="form-text text-muted">To save results, the four-digit P.I.D. must match the P.I.D. previously entered.</small>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="submitResultsButton" type="button" class="btn btn-primary">Save Results</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="center" id="gameArea" width="100%">
+		<!-- Game content -->
+		<div id="game-left" class="left-half">
+			<img class="stimulus heart" id="heartLeft" src="img/hearts.svg"/>
+			<img class="stimulus flower" id="flowerLeft" src="img/flower.svg"/>
+		</div>
+		<div id="game-right" class="right-half">
+			<img class="stimulus heart" id="heartRight" src="img/hearts.svg"/>
+			<img class="stimulus flower" id="flowerRight" src="img/flower.svg"/>
+		</div>
+		<div id="instructions-bg" class="both-halves blue-fill instructions"></div>
+		<div id="instructions-txt" class="left-half pane overlay-text instructions"></div>
+		<div id="instructions-img" class="right-half pane instructions"></div>
+	</div>
+	
+</body>
