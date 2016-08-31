@@ -5,7 +5,7 @@ function HeartsAndFlowersController(opts) {
 
 	this.opts = opts;
 	console.log(opts);
-	var appearanceTimer = null;
+	this.appearanceTimer = null;
 	var controller = this;
 	var results = [];
 	var isFinalRound = false;
@@ -547,12 +547,16 @@ function HeartsAndFlowersController(opts) {
 					"conditionNumber": data.number
 				});
 
-				appearanceTimer = setTimeout(function() {
-						$(ALL_STIMULI_SELECTOR).hide();
-						controller.game.update();
-				}, controller.game.appearanceTime);
+				controller.appearanceTimer = setTimeout(function() {
+					controller.beginNextCondition();	
+				}, phaseIndex < 3 ? 100000 : controller.game.appearanceTime);
 			}, data.wait);
 		}
+	};
+
+	this.beginNextCondition = function(){
+		$(ALL_STIMULI_SELECTOR).hide();
+		controller.game.update();
 	};
 
 	this.formatResults = function(results){
@@ -580,7 +584,7 @@ function HeartsAndFlowersController(opts) {
 			"type": "INPUT",
 			"time": performance.now(),
 			"input": input,
-			"isCorrect": this.game.isCorrect(input, this.game.getCondition())
+			"isCorrect": controller.game.isCorrect(input, controller.game.getCondition())
 		});
 	}
 
@@ -630,21 +634,37 @@ function HeartsAndFlowersController(opts) {
 	// Inputs during game
 	$(LEFT_GAME_PANE_SELECTOR).click(function(evt,err){
 		controller.registerGameInput(INPUT_LEFT);
+		if (phaseIndex < 3 && controller.game.isCorrect(INPUT_LEFT, controller.game.getCondition())){
+			clearTimeout(controller.appearanceTimer);
+			controller.beginNextCondition();
+		};
 	});
 
 	$(RIGHT_GAME_PANE_SELECTOR).click(function(evt,err){
 		controller.registerGameInput(INPUT_RIGHT);
+		if (phaseIndex < 3 && controller.game.isCorrect(INPUT_RIGHT, controller.game.getCondition())){
+			clearTimeout(controller.appearanceTimer);
+			controller.beginNextCondition();
+		};
 	});
 
 	$(window).keydown(function(evt,err){
+		input = null;
 		switch(evt.keyCode){
 			case 37:
-				controller.registerGameInput(INPUT_LEFT);
+				input = INPUT_LEFT;
 				break;
 			case 39:
-				controller.registerGameInput(INPUT_RIGHT);
+				input = INPUT_RIGHT;
 				break;
-		}
+		};
+		if (input) {
+			controller.registerGameInput(input);
+			if (phaseIndex < 3 && controller.game.isCorrect(input, controller.game.getCondition())){
+				clearTimeout(controller.appearanceTimer);
+				controller.beginNextCondition();
+			};
+		};
 	});
 
 	////////////////////////////

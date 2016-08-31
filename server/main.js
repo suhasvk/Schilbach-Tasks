@@ -6,7 +6,7 @@ var app = express();
 
 app.use(express.static('static'));
 
-app.get('/translations', function(req,res){
+app.get('/language', function(req,res){
 	// TODO get translations mapping
 });
 
