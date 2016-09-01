@@ -4,8 +4,9 @@
 var express = require('express');
 var app = express();
 
-app.use(express.static('static'));
-
+app.use(express.static('shared'));
+app.use(express.static('BeginTask'));
+app.use(express.static('HeartsAndFlowers'))
 app.get('/language', function(req,res){
 	// TODO get translations mapping
 });
