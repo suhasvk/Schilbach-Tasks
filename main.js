@@ -6,15 +6,19 @@ TASK_NAME_HEARTSANDFLOWERS = 'Hearts and Flowers';
 TASK_NAME_CORSI = 'Corsi';
 TASK_NAME_N_BACK = 'N-Back';
 
-
 HF_TASK_ID = 1;
-HF_TASK_PHASE_HEARTS = 'HeartsPhase';
-HF_TASK_PHASE_FLOWERS = 'FlowersPhase';
-HF_TASK_PHASE_BOTH = 'BothPhase';
+
+
+var port = process.env.PORT || 8080;
 
 HF_FORMAT_SETTINGS = function(settings_row, query, response){
 	var heart_stimulus_path;
 	var flower_stimulus_path;
+
+	HF_TASK_PHASE_HEARTS = 'HeartsPhase';
+	HF_TASK_PHASE_FLOWERS = 'FlowersPhase';
+	HF_TASK_PHASE_BOTH = 'BothPhase';
+
 	db.get('SELECT PATH FROM STIMULI WHERE ID = $id',{$id:settings_row.STIMULUS_ID_HEART}, function(e3,r3){
 		if (e3) {
 			console.log(e3);
@@ -248,7 +252,7 @@ app.get('/', function(req, res) {
 	res.send('Hello World!');
 });
 
-app.listen(3000, function() {
-	console.log('Listening on port 3000.')
+app.listen(port, function() {
+	console.log('Listening on port '+port+'.');
 });
 
