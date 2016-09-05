@@ -104,10 +104,10 @@ var port = process.env.PORT || 8080;
 // 	});
 // }
 
-// var express = require('express');
-// var sqlite3 = require('sqlite3').verbose();
+var express = require('express');
+var sqlite3 = require('sqlite3').verbose();
 
-// var app = express();
+var app = express();
 // var db = new sqlite3.Database('resources.db');
 
 // app.use(express.static('shared'));
