@@ -1,0 +1,24 @@
+{
+  "name": "Tasks",
+  "version": "1.0.0",
+  "description": "Server for cognitive tasks application.",
+  "main": "main.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "sqlite3": "^3.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/suhasvk/Schilbach-Tasks.git"
+  },
+  "author": "Suhas Vijaykumar and Akshara Tejaswi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/suhasvk/Schilbach-Tasks/issues"
+  },
+  "homepage": "https://github.com/suhasvk/Schilbach-Tasks"
+}
