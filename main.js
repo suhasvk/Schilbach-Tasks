@@ -1,7 +1,7 @@
 // main.js
 // This file runs the node.js server loop
 
-Constants
+// Constants
 TASK_NAME_HEARTSANDFLOWERS = 'Hearts and Flowers';
 TASK_NAME_CORSI = 'Corsi';
 TASK_NAME_N_BACK = 'N-Back';
