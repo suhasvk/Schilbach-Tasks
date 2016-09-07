@@ -79,7 +79,7 @@ function SessionCreationController() {
 			setting_id: Number($(PRESET_INPUT_SELECTOR).val()),
 			rid: controller.rid
 		};
-		$.get('/create-session', data, function(resp){
+		$.post('/create-session', data, function(resp){
 			window.location.href = "/HeartsAndFlowers.html?session_id="+resp.session_id;
 		})
 

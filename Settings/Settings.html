@@ -1,0 +1,88 @@
+<!-- Settings.html -->
+<!DOCTYPE html5>
+<html>
+	<head>
+
+		<script src="lib/jquery/jquery.min.js"></script>
+		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+		<script src="src/Settings.js"></script>
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css"/>
+		<style>
+			.tab-content{
+				padding-top: 10px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<!-- Setting setup input area -->
+		<div class="modal fade" id="settingsModal" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<a class="close" data-dismiss="modal">&times;</a>
+						<h3>Create settings preset</h3>
+					</div>
+					<div class="modal-body">
+              			<ul class="nav nav-pills nav-justified">
+              				<li role="presentation" class="active"><a data-toggle="pill" href='#tab-general'>General</a></li>
+              				<li role="presentation"><a data-toggle="pill" href='#tab-mechanics'>Mechanics</a></li>
+              				<li role="presentation"><a data-toggle="pill" href='#tab-practice'>Practice</a></li>
+              				<li role="presentation"><a data-toggle="pill" href='#tab-stimuli'>Stimuli</a></li>
+              			</ul>
+	              		<div class="tab-content">
+	              			<div class="tab-pane active" id="tab-general">
+	              				<fieldset class="form-horizontal" role="form">
+			                  		<div class="form-group">
+					                    <label  class="col-sm-4 control-label" for="taskInput">Task</label>
+					                    <div class="col-sm-6">
+					                        <select type="text" class="form-control" id="taskInput"></select>
+					                    </div>
+			                 		</div>
+			                  		<div class="form-group">
+					                    <label  class="col-sm-4 control-label" for="nameInput">Preset name</label>
+					                    <div class="col-sm-6">
+					                        <input type="text" class="form-control" id="nameInput"></input>
+					                    </div>
+			                 		</div>				                 	
+		              			</fieldset>
+	              			</div>
+	              			<div class="tab-pane" id="tab-mechanics">2
+	              			</div>
+	              			<div class="tab-pane" id="tab-practice">3
+	              			</div>
+	              			<div class="tab-pane" id="tab-stimuli">
+	              				<form class="form-inline" action="/new-stimulus" method="post">
+	              					<div class="form-group">
+			              				<label id="fileUploadButton" class="btn btn-default btn-file">
+			              					Upload new stimulus
+										    <input id="fileInput" class="hidden" type="file">
+										</label>
+									</div>
+									<div class="form-group">
+										<label id="submitStimulusButton" class="btn btn-primary disabled">
+											Submit <b id="fileName"></b>
+										</label>
+										<script>
+										$("#fileInput").change(function(){
+											if (($('#fileInput').val()).length > 0) {
+												$('#fileName')
+													.text($("#fileInput")[0].files[0].name)
+												.parent()
+													.removeClass('disabled');
+											}
+										});
+										</script>
+									</div>
+								</form>
+	              			</div>
+	              		</div>
+	              	</div>
+					<div class="modal-footer">
+						<a id="chooseSettingsButton" href="#" class="btn btn-primary ridInputPaneItem">Create settings preset.</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

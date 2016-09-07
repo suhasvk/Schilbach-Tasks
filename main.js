@@ -8,8 +8,6 @@ TASK_NAME_N_BACK = 'N-Back';
 
 HF_TASK_ID = 1;
 
-var port = process.env.PORT || 8080;
-
 HF_FORMAT_SETTINGS = function(settings_row, query, response){
 	var heart_stimulus_path;
 	var flower_stimulus_path;
@@ -103,15 +101,29 @@ HF_FORMAT_SETTINGS = function(settings_row, query, response){
 	});
 }
 
-var express = require('express');
-var sqlite3 = require('sqlite3').verbose();
-
+const port = process.env.PORT || 8080;
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
+const bodyParser = require('body-parser');
 var app = express();
 var db = new sqlite3.Database('resources.db');
 
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+
+app.use(bodyParser.json());
+
+app.listen(port, function() {
+	console.log('Listening on port '+port+'.');
+});
+
 app.use(express.static('shared'));
 app.use(express.static('BeginTask'));
-app.use(express.static('HeartsAndFlowers'))
+app.use(express.static('HeartsAndFlowers'));
+app.use(express.static('Settings'));
+
 app.get('/language', function(req,res){
 	// TODO get translations mapping
 });
@@ -150,15 +162,15 @@ app.get('/settings-presets', function(req,res){
 	}
 });
 
-app.get('/create-session', function(req,res){
-	console.log(req.query.setting_id);
-	db.get("SELECT TASK_ID FROM ALL_SETTINGS WHERE ID = $setting_id",{$setting_id: req.query.setting_id}, function(err,row){
+app.post('/create-session', function(req,res){
+	console.log(req.body);
+	db.get("SELECT TASK_ID FROM ALL_SETTINGS WHERE ID = $setting_id",{$setting_id: req.body.setting_id}, function(err,row){
 		if (err) {
 			console.log(err);
 		} else {
 			db.run("INSERT INTO SESSION VALUES (NULL,$setting_id,$rid,$task_id,$creation_time)", {
-				$setting_id: req.query.setting_id,
-				$rid: req.query.rid,
+				$setting_id: req.body.setting_id,
+				$rid: req.body.rid,
 				$task_id: row.TASK_ID,
 				$creation_time: (new Date()).getTime()
 			}, function(error){
@@ -166,7 +178,7 @@ app.get('/create-session', function(req,res){
 					console.log(error);
 				} else {
 					res.send({
-						query: req.query,
+						request: req.body,
 						session_id: this.lastID
 					});
 				}
@@ -205,11 +217,11 @@ app.get('/initialize-session', function(req,res){
 	});
 });
 
-app.get('/save-results', function(req,res){
-	var task_id = Number(req.query.task_id);
+app.post('/save-results', function(req,res){
+	var task_id = Number(req.body.task_id);
 	var data = {
-		$session_id: req.query.session_id,
-		$pid: req.query.pid,
+		$session_id: req.body.session_id,
+		$pid: req.body.pid,
 	}
 	db.run("INSERT INTO ALL_RESULTS VALUES (NULL, $pid, $session_id)",data,function(e){
 		if (e) {
@@ -219,21 +231,22 @@ app.get('/save-results', function(req,res){
 			switch(task_id) {
 				// This is where we write results to database
 				case 1:
-					console.log(req.query);
-					console.log(result_id)
-					db.run("INSERT INTO HEARTS_AND_FLOWERS_RESULTS VALUES ($id, $avg_time_1, $avg_time_2, $avg_timet_3, $n_correct_1, $n_correct_2, $n_correct_3, $raw)" , {
+					db.run("INSERT INTO HEARTS_AND_FLOWERS_RESULTS VALUES ($id, $avg_time_1, $avg_time_2, $avg_time_3, $n_correct_1, $n_correct_2, $n_correct_3, $raw, $deviceInfo)" , {
 						$id: result_id,
-						$avg_time_1: req.query.resultData.avg_time_1,
-						$avg_time_2: req.query.resultData.avg_time_2,
-						$avg_time_3: req.query.resultData.avg_time_3,
-						$n_correct_1: req.query.resultData.n_correct_1,
-						$n_correct_2: req.query.resultData.n_correct_2,
-						$n_correct_3: req.query.resultData.n_correct_3,
-						$raw: req.query.resultData.raw
+						$avg_time_1: req.body.resultData.avg_time_1,
+						$avg_time_2: req.body.resultData.avg_time_2,
+						$avg_time_3: req.body.resultData.avg_time_3,
+						$n_correct_1: req.body.resultData.n_correct_1,
+						$n_correct_2: req.body.resultData.n_correct_2,
+						$n_correct_3: req.body.resultData.n_correct_3,
+						$raw: req.body.resultData.raw,
+						$deviceInfo: req.body.resultData.deviceInfo
 					}, function(ee){
 						if(ee){
+							console.log(ee);
 							res.send({"success":false});
 						} else {
+
 							res.send({"success":true});
 						}
 					});
@@ -241,6 +254,11 @@ app.get('/save-results', function(req,res){
 			}
 		}
 	});
+});
+
+app.post('/new-stimulus', function(req,res){
+	console.log(req);
+	res.send({'poop':true});
 });
 
 app.get('/create-setting', function(req,res){
@@ -251,7 +269,4 @@ app.get('/', function(req, res) {
 	res.send('Hello World!');
 });
 
-app.listen(port, function() {
-	console.log('Listening on port '+port+'.');
-});
 

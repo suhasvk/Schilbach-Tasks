@@ -601,8 +601,9 @@ function HeartsAndFlowersController(opts, session_id) {
 	};
 
 	this.saveResults = function(){
-		console.log(controller.results);
-		$.get('/save-results',{
+		console.log(controller.results.toString());
+		console.log(JSON.stringify(controller.results));
+		$.post('/save-results',{
 			session_id: controller.session_id,
 			pid: controller.pid,
 			task_id: HF_TASK_ID,
@@ -613,6 +614,7 @@ function HeartsAndFlowersController(opts, session_id) {
 				n_correct_1: controller.results[1].summary.totalCorrect,
 				n_correct_2: controller.results[3].summary.totalCorrect,
 				n_correct_3: controller.results[5].summary.totalCorrect,
+				deviceInfo: navigator.userAgent,
 				raw: JSON.stringify(controller.results)
 			}
 		});
