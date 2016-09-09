@@ -187,6 +187,24 @@ app.post('/create-session', function(req,res){
 	});
 })
 
+app.get('/tasks-list', function(req,res){
+	db.all("SELECT ID, NAME FROM TASK", function(err,rows){
+		res.send({
+			query: req.query,
+			tasks: rows
+		});
+	});
+});
+
+app.get('/stimuli-list', function(req,res){
+	db.all("SELECT * FROM STIMULI", function(err,rows){
+		res.send({
+			query: req.query,
+			tasks: rows
+		});
+	});
+});
+
 app.get('/initialize-session', function(req,res){
 	var setting_id;
 	var settings_table_name;
@@ -257,12 +275,12 @@ app.post('/save-results', function(req,res){
 });
 
 app.post('/new-stimulus', function(req,res){
-	console.log(req);
-	res.send({'poop':true});
+	console.log(req.body);
+	res.send({'error':true});
 });
 
 app.get('/create-setting', function(req,res){
-	// TODO create a new setting
+	// TODO
 });
 
 app.get('/', function(req, res) {

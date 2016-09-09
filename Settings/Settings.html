@@ -5,10 +5,19 @@
 
 		<script src="lib/jquery/jquery.min.js"></script>
 		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+		<script src="HeartsAndFlowersSettings.js"></script>
 		<script src="src/Settings.js"></script>
+
+
+
 		<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css"/>
 		<style>
 			.tab-content{
+				padding-top: 10px;
+			}
+
+			.form-inline {
 				padding-top: 10px;
 			}
 		</style>
@@ -36,50 +45,50 @@
 			                  		<div class="form-group">
 					                    <label  class="col-sm-4 control-label" for="taskInput">Task</label>
 					                    <div class="col-sm-6">
-					                        <select type="text" class="form-control" id="taskInput"></select>
+					                        <select column="TASK_ID" type="text" class="form-control" id="taskInput"></select>
 					                    </div>
 			                 		</div>
 			                  		<div class="form-group">
 					                    <label  class="col-sm-4 control-label" for="nameInput">Preset name</label>
 					                    <div class="col-sm-6">
-					                        <input type="text" class="form-control" id="nameInput"></input>
+					                        <input type="text" class="form-control" column="NAME" id="nameInput"></input>
 					                    </div>
 			                 		</div>				                 	
 		              			</fieldset>
 	              			</div>
-	              			<div class="tab-pane" id="tab-mechanics">2
+	              			<div class="tab-pane variable" id="tab-mechanics">
 	              			</div>
-	              			<div class="tab-pane" id="tab-practice">3
+	              			<div class="tab-pane variable" id="tab-practice">
 	              			</div>
 	              			<div class="tab-pane" id="tab-stimuli">
-	              				<form class="form-inline" action="/new-stimulus" method="post">
+	   							<div id="stimuli-variable-region" class="container-fluid variable">
+	   							</div>
+	   							<div class="container">
+	              				<form class="form-inline" enctype="multipart/form-data" method="POST" action="/new-stimulus">
 	              					<div class="form-group">
-			              				<label id="fileUploadButton" class="btn btn-default btn-file">
-			              					Upload new stimulus
+			              				<label id="stimulusUpload" for="fileInput" class="btn btn-default btn-file">
+			              					Select new stimulus
 										    <input id="fileInput" class="hidden" type="file">
-										</label>
+										</label> 
 									</div>
 									<div class="form-group">
-										<label id="submitStimulusButton" class="btn btn-primary disabled">
-											Submit <b id="fileName"></b>
-										</label>
+										<div class="input-group">
+										  <span class="input-group-addon" id="fileName">No file selected</span class="input-group-addon">
+									      <input id="stimulusName" type="text" class="form-control" placeholder="Enter name...">
+									      <span class="input-group-btn">
+									        <button type="submit" id="createStimulus" class="btn btn-primary disabled" type="button">Upload</button>
+									      </span>
+									    </div>
 										<script>
-										$("#fileInput").change(function(){
-											if (($('#fileInput').val()).length > 0) {
-												$('#fileName')
-													.text($("#fileInput")[0].files[0].name)
-												.parent()
-													.removeClass('disabled');
-											}
-										});
 										</script>
 									</div>
 								</form>
+							</div>
 	              			</div>
 	              		</div>
 	              	</div>
 					<div class="modal-footer">
-						<a id="chooseSettingsButton" href="#" class="btn btn-primary ridInputPaneItem">Create settings preset.</a>
+						<a id="chooseSettingsButton" href="#" class="btn btn-primary ridInputPaneItem">Finish.</a>
 					</div>
 				</div>
 			</div>
