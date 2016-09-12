@@ -75,14 +75,32 @@ function SessionCreationController() {
 	};
 
 	this.createSession = function(){
-		data = {
+		
+		var data = {
 			setting_id: Number($(PRESET_INPUT_SELECTOR).val()),
 			rid: controller.rid
 		};
-		$.post('/create-session', data, function(resp){
-			window.location.href = "/HeartsAndFlowers.html?session_id="+resp.session_id;
-		})
-
+		var form_data = new FormData();
+		for (key in data) {
+			form_data.append(key,data[key]);
+		}
+		$.ajax({
+	    type: "POST",
+		    url: "/create-session",
+		    data: form_data,
+		    processData: false,
+		    contentType: false,
+		    success: function(response) {
+		    	if (!response.success) {
+		    		// TODO CACHE RESULTS
+		    	} else {
+		    		window.location.href = "/HeartsAndFlowers.html?session_id="+response.session_id;
+		    	}
+		    },
+		    error: function(errResponse) {
+		        console.log(errResponse);
+		    }
+		});
 	}
 
 	// Populate task selection list

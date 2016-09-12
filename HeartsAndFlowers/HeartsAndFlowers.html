@@ -16,6 +16,8 @@
 			session_id: q_data.session_id
 		}, function(data){
 			hfc = new HeartsAndFlowersController(data.settings, q_data.session_id);
+			$('.heart').attr('src',hfc.heartPath());
+			$('.flower').attr('src',hfc.flowerPath());
 			hfc.addEventListener(EVENT_END_SEQUENCE,function(data){
 				for (category in data.displayResults) {
 					var block = document.createElement('p');
@@ -32,6 +34,7 @@
 			console.log('Loaded settings.')
 		});
 	</script>
+
 	<script>
 		isValidPid = function(pid){
 			return (1000 <= pid && pid <= 9999);

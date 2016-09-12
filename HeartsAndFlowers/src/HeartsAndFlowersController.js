@@ -30,6 +30,14 @@ function HeartsAndFlowersController(opts, session_id) {
 		return phaseIndex == 5;
 	}
 
+	this.flowerPath = function(){
+		return controller.opts[0].stimuli.flower;
+	}
+
+	this.heartPath = function(){
+		return controller.opts[0].stimuli.heart;
+	}
+
 	this.beginPhase = function(){
 		controller.game = new HeartsAndFlowersTask(controller.pid,controller.opts[phaseIndex]);
 		controller.initialize(controller.game, !controller.isPractice());
@@ -579,6 +587,7 @@ function HeartsAndFlowersController(opts, session_id) {
 				"newCondition": data.newCondition
 			});
 		});
+
 		game.addEventListener(EVENT_TASK_END, function(data){
 			$(ALL_STIMULI_SELECTOR).css('display','none');
 			results.push({
@@ -601,9 +610,7 @@ function HeartsAndFlowersController(opts, session_id) {
 	};
 
 	this.saveResults = function(){
-		console.log(controller.results.toString());
-		console.log(JSON.stringify(controller.results));
-		$.post('/save-results',{
+		var data = {
 			session_id: controller.session_id,
 			pid: controller.pid,
 			task_id: HF_TASK_ID,
@@ -617,6 +624,28 @@ function HeartsAndFlowersController(opts, session_id) {
 				deviceInfo: navigator.userAgent,
 				raw: JSON.stringify(controller.results)
 			}
+		};
+
+		var form_data = new FormData();
+
+		for (key in data) {
+			form_data.append(key,data[key]);
+		}
+
+		$.ajax({
+	    type: "POST",
+		    url: "/save-results",
+		    data: form_data,
+		    processData: false,
+		    contentType: false,
+		    success: function(response) {
+		    	if (!response.success) {
+		    		// TODO CACHE RESULTS
+		    	}
+		    },
+		    error: function(errResponse) {
+		        console.log(errResponse);
+		    }
 		});
 	};
 

@@ -1,6 +1,8 @@
 // main.js
 // This file runs the node.js server loop
 
+// debug
+
 // Constants
 TASK_NAME_HEARTSANDFLOWERS = 'Hearts and Flowers';
 TASK_NAME_CORSI = 'Corsi';
@@ -105,15 +107,13 @@ const port = process.env.PORT || 8080;
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
-const bodyParser = require('body-parser');
+const busboyBodyParser = require('busboy-body-parser');
+const path = require('path');
+
 var app = express();
 var db = new sqlite3.Database('resources.db');
 
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
-
-app.use(bodyParser.json());
+app.use(busboyBodyParser({limit:'5mb'}));
 
 app.listen(port, function() {
 	console.log('Listening on port '+port+'.');
@@ -176,10 +176,15 @@ app.post('/create-session', function(req,res){
 			}, function(error){
 				if (error){
 					console.log(error);
+					res.send({
+						success: false,
+						error: error
+					});
 				} else {
 					res.send({
 						request: req.body,
-						session_id: this.lastID
+						session_id: this.lastID,
+						success: true
 					});
 				}
 			});
@@ -275,12 +280,99 @@ app.post('/save-results', function(req,res){
 });
 
 app.post('/new-stimulus', function(req,res){
-	console.log(req.body);
-	res.send({'error':true});
+	var name = req.body["stimulus-name"];
+	var file = req.files["stimulus-file"];
+	var file_save_name = file.name.split('.').slice(0,-1).join('') //this is the original file name (minus extension)
+							+ (new Date).getTime() //this is an integer corresponding to the date and time, to avoid naming conflicts
+							+ '.' + file.name.split('.').slice(-1); //this is the original file extension
+
+
+	// TODO FILE VALIDATION
+
+
+	// Write file to server and insert into database:
+	var rel_path = path.join('img', file_save_name);
+	var file_path = path.join(__dirname, 'shared', rel_path);
+	fs.writeFile(file_path, file.data, function (err) {
+		if (err){
+			console.log(err);
+			res.send({
+				success: false,
+				errorType: "file-write",
+				error: err
+			});
+		} else {
+			db.run("INSERT INTO STIMULI VALUES (NULL, $path, $name)",{
+				$path: rel_path,
+				$name: name
+			}, function(er){
+				if (er) {
+					console.log(er);
+					fs.unlink(file_path);
+					res.send({
+						success: false,
+						errorType: "db-insert",
+						error: er
+					});
+				} else {
+					res.send({
+						success: true
+					});
+				}
+			});
+		}
+	});
+
 });
 
-app.get('/create-setting', function(req,res){
-	// TODO
+app.post('/create-setting', function(req,res){
+	var setting_name = req.body.NAME;
+	var task_id = Number(req.body.TASK_ID);
+	db.run("INSERT INTO ALL_SETTINGS VALUES (NULL, $name, $id)", {
+		$id: task_id,
+		$name: setting_name
+	}, function(error) {
+		if (error) {
+			// TODO
+		} else {
+			var setting_id = this.lastID;
+			switch(task_id) {
+				case 1:
+					db.run("INSERT INTO HEARTS_AND_FLOWERS_SETTINGS VALUES ($ID,$PRACTICE_ISI_MIN,$PRACTICE_ISI_MAX,$APPEARANCE_TIME,$ISI_MIN,$ISI_MAX,$PRACTICE_R1_LENGTH,$PRACTICE_R2_LENGTH,$PRACTICE_R3_LENGTH,$R1_LENGTH,$R2_LENGTH,$R3_LENGTH,$STIMULUS_ID_HEART,$STIMULUS_ID_FLOWER,$NAME, 1000)", 
+					{
+						$ID: req.body.ID,
+						$PRACTICE_ISI_MIN: req.body.PRACTICE_ISI_MIN,
+						$PRACTICE_ISI_MAX: req.body.PRACTICE_ISI_MAX,
+						$APPEARANCE_TIME: req.body.APPEARANCE_TIME,
+						$ISI_MIN: req.body.ISI_MIN,
+						$ISI_MAX: req.body.ISI_MAX,
+						$PRACTICE_R1_LENGTH: req.body.PRACTICE_R1_LENGTH,
+						$PRACTICE_R2_LENGTH: req.body.PRACTICE_R2_LENGTH,
+						$PRACTICE_R3_LENGTH: req.body.PRACTICE_R3_LENGTH,
+						$R1_LENGTH: req.body.R1_LENGTH,
+						$R2_LENGTH: req.body.R2_LENGTH,
+						$R3_LENGTH: req.body.R3_LENGTH,
+						$STIMULUS_ID_HEART: req.body.STIMULUS_ID_HEART,
+						$STIMULUS_ID_FLOWER: req.body.STIMULUS_ID_FLOWER,
+						$NAME: req.body.NAME
+					}, function(err){
+						if(err) {
+							console.log(err);
+							res.send({
+								success: false,
+								errorType: 'db-insert',
+								error: err
+							});
+						} else {
+							res.send({
+								success: true
+							});
+						}
+					})
+					break;
+			}
+		}
+	})
 });
 
 app.get('/', function(req, res) {

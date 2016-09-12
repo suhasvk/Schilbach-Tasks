@@ -112,6 +112,7 @@ var submit = function(){
 	    contentType: false,
 	    success: function(response) {
 	    	console.log(response);
+	    	window.location.reload(true);
 	    },
 	    error: function(errResponse) {
 	        console.log(errResponse);
