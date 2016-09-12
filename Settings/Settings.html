@@ -6,7 +6,7 @@
 		<script src="lib/jquery/jquery.min.js"></script>
 		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 
-		<script src="HeartsAndFlowersSettings.js"></script>
+		<script src="src/SettingsLib.js"></script>
 		<script src="src/Settings.js"></script>
 
 
@@ -63,32 +63,30 @@
 	              			<div class="tab-pane" id="tab-stimuli">
 	   							<div id="stimuli-variable-region" class="container-fluid variable">
 	   							</div>
-	   							<div class="container">
-	              				<form class="form-inline" enctype="multipart/form-data" method="POST" action="/new-stimulus">
-	              					<div class="form-group">
-			              				<label id="stimulusUpload" for="fileInput" class="btn btn-default btn-file">
-			              					Select new stimulus
-										    <input id="fileInput" class="hidden" type="file">
-										</label> 
-									</div>
-									<div class="form-group">
-										<div class="input-group">
-										  <span class="input-group-addon" id="fileName">No file selected</span class="input-group-addon">
-									      <input id="stimulusName" type="text" class="form-control" placeholder="Enter name...">
-									      <span class="input-group-btn">
-									        <button type="submit" id="createStimulus" class="btn btn-primary disabled" type="button">Upload</button>
-									      </span>
-									    </div>
-										<script>
-										</script>
+	   							<form class="container" enctype="multipart/form-data" method="POST" action="/new-stimulus">
+		              				<div class="form-inline">
+		              					<div class="form-group">
+				              				<label id="stimulusUpload" for="fileInput" class="btn btn-default btn-file">
+				              					Select new stimulus
+											    <input id="fileInput" class="hidden" type="file">
+											</label> 
+										</div>
+										<div class="form-group" id="uploadGroup">
+											<div class="input-group">
+											  <span class="input-group-addon" id="fileName">No file selected</span class="input-group-addon">
+										      <input id="stimulusName" type="text" class="form-control" placeholder="Enter name...">
+										      <span class="input-group-btn">
+										        <button type="submit" id="createStimulus" class="btn btn-primary disabled" type="button">Upload</button>
+										      </span>
+										    </div>
+										</div>
 									</div>
 								</form>
-							</div>
 	              			</div>
 	              		</div>
 	              	</div>
 					<div class="modal-footer">
-						<a id="chooseSettingsButton" href="#" class="btn btn-primary ridInputPaneItem">Finish.</a>
+						<a id="chooseSettingsButton" href="#" class="btn btn-primary">Finish.</a>
 					</div>
 				</div>
 			</div>
