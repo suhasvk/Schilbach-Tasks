@@ -1,0 +1,79 @@
+<!-- Results.html -->
+<head>
+	<script src="lib/jquery/jquery.min.js"></script>
+	<script src="lib/moment/min/moment-with-locales.min.js"></script>
+	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="lib/bootstrap-datetimepicker/src/bootstrap-datetimepicker.js"></script>
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.css"/>
+
+	<script src="src/ResultsLib.js"></script>
+	<script src="src/Results.js"></script>
+</head>
+
+<body>
+	<div class="modal fade" id="selectionModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<a class="close" data-dismiss="modal">&times;</a>
+					<h3>Results Selection</h3>
+				</div>
+				<div class="modal-body">
+          			<fieldset>
+          				<div class="form-group">
+		                    <label  class="control-label" for="taskSelector">Task Name</label>
+	                        <select type="text" class="form-control" id="taskSelector"></select>
+                 		</div>
+			            <div class="form-group">
+			            	<label  class="control-label" for="afterPicker">View Results After</label>
+				                <div class='input-group date' id='afterPicker'>
+				                    <input type='text' class="form-control" />
+				                    <span class="input-group-addon">
+				                        <span class="glyphicon glyphicon-calendar"></span>
+				                    </span>
+				                </div>
+					    </div>
+			            <div class="form-group">
+			            	<label  class="control-label" for="beforePicker">View Results Before</label>
+				                <div class='input-group date' id='beforePicker'>
+				                    <input type='text' class="form-control" />
+				                    <span class="input-group-addon">
+				                        <span class="glyphicon glyphicon-calendar"></span>
+				                    </span>
+				                </div>
+					    </div>
+          			</fieldset>
+              	</div>
+				<div class="modal-footer">
+					<a id="viewResultsButton" href="#" class="btn btn-primary">Search.</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="infoModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+				<button id="closeInfo" type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 id="infoTitle" class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="container">
+						<div id='infoArea'class="col-xs-8">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+	  <h2>Results</h2>
+	  <table id="resultsTable" class="table table-striped">
+	    <thead>
+	      <tr id="resultsHeaderRow">
+	      </tr>
+	    </thead>
+	  </table>
+	</div>
+</body>
