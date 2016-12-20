@@ -52,7 +52,7 @@ HeartsAndFlowersTask = function(ID,opts){
 		}
 
 		else {
-			console.log("Erraneous HeartsAndFlowersTask.begin() call.");
+			console.log("Erroneous HeartsAndFlowersTask.begin() call.");
 		}
 	}
 

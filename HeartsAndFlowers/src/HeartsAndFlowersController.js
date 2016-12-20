@@ -614,16 +614,15 @@ function HeartsAndFlowersController(opts, session_id) {
 			session_id: controller.session_id,
 			pid: controller.pid,
 			task_id: HF_TASK_ID,
-			resultData: {
-				avg_time_1: controller.results[1].summary.averageTime,
-				avg_time_2: controller.results[3].summary.averageTime,
-				avg_time_3: controller.results[5].summary.averageTime,
-				n_correct_1: controller.results[1].summary.totalCorrect,
-				n_correct_2: controller.results[3].summary.totalCorrect,
-				n_correct_3: controller.results[5].summary.totalCorrect,
-				deviceInfo: navigator.userAgent,
-				raw: JSON.stringify(controller.results)
-			}
+			time: parseInt((new Date()).getTime()/1000),			
+			avg_time_1: controller.results[1].summary.averageTime,
+			avg_time_2: controller.results[3].summary.averageTime,
+			avg_time_3: controller.results[5].summary.averageTime,
+			n_correct_1: controller.results[1].summary.totalCorrect,
+			n_correct_2: controller.results[3].summary.totalCorrect,
+			n_correct_3: controller.results[5].summary.totalCorrect,
+			deviceInfo: navigator.userAgent,
+			raw: JSON.stringify(controller.results)
 		};
 
 		var form_data = new FormData();

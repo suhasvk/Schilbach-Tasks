@@ -115,3 +115,4 @@ randomConditionList = function(length, phase){
 	else console.log('ERROR INVALID TASK PHASE: ' + phase);
 	return conditionList;
 }
+

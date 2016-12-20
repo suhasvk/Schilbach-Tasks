@@ -123,6 +123,7 @@ app.use(express.static('shared'));
 app.use(express.static('BeginTask'));
 app.use(express.static('HeartsAndFlowers'));
 app.use(express.static('Settings'));
+app.use(express.static('Results'));
 
 app.get('/language', function(req,res){
 	// TODO get translations mapping
@@ -148,6 +149,8 @@ app.get('/validate-rid', function(req,res){
 	});
 });
 
+// Given a task id, this returns a list of all settings presets corresponding to that task
+// TODO fix to pull task-specific table name from database given task id 
 app.get('/settings-presets', function(req,res){
 	var task = req.query.task;
 	switch(task){
@@ -157,6 +160,22 @@ app.get('/settings-presets', function(req,res){
 					query: req.query,
 					presets: rows
 				});
+			});
+			break;
+	}
+});
+
+// Given a task id and setting id, this returns information about the specified setting
+// TODO fix to pull task-specific table name from database given task id
+app.get('/view-setting', function(req,res){
+	var task = req.query.task;
+	var setting_id = req.query.setting_id;
+	console.log(req.query);
+	switch(task){
+		case TASK_NAME_HEARTSANDFLOWERS:
+			db.get('SELECT * FROM HEARTS_AND_FLOWERS_SETTINGS WHERE ID = $id',{$id: setting_id}, function(err,setting){
+				console.log(setting);
+				res.send(setting);
 			});
 			break;
 	}
@@ -192,6 +211,7 @@ app.post('/create-session', function(req,res){
 	});
 })
 
+// This serves a list of all available tasks (names, IDs).
 app.get('/tasks-list', function(req,res){
 	db.all("SELECT ID, NAME FROM TASK", function(err,rows){
 		res.send({
@@ -201,6 +221,7 @@ app.get('/tasks-list', function(req,res){
 	});
 });
 
+// This serves a list of all stimulus images
 app.get('/stimuli-list', function(req,res){
 	db.all("SELECT * FROM STIMULI", function(err,rows){
 		res.send({
@@ -245,8 +266,10 @@ app.post('/save-results', function(req,res){
 	var data = {
 		$session_id: req.body.session_id,
 		$pid: req.body.pid,
+		$time: req.body.time
 	}
-	db.run("INSERT INTO ALL_RESULTS VALUES (NULL, $pid, $session_id)",data,function(e){
+	console.log(req.body);
+	db.run("INSERT INTO ALL_RESULTS VALUES (NULL, $pid, $session_id, datetime($time,'unixepoch'))",data,function(e){
 		if (e) {
 			console.log(e);
 		} else {
@@ -254,16 +277,17 @@ app.post('/save-results', function(req,res){
 			switch(task_id) {
 				// This is where we write results to database
 				case 1:
+					console.log('pow');
 					db.run("INSERT INTO HEARTS_AND_FLOWERS_RESULTS VALUES ($id, $avg_time_1, $avg_time_2, $avg_time_3, $n_correct_1, $n_correct_2, $n_correct_3, $raw, $deviceInfo)" , {
 						$id: result_id,
-						$avg_time_1: req.body.resultData.avg_time_1,
-						$avg_time_2: req.body.resultData.avg_time_2,
-						$avg_time_3: req.body.resultData.avg_time_3,
-						$n_correct_1: req.body.resultData.n_correct_1,
-						$n_correct_2: req.body.resultData.n_correct_2,
-						$n_correct_3: req.body.resultData.n_correct_3,
-						$raw: req.body.resultData.raw,
-						$deviceInfo: req.body.resultData.deviceInfo
+						$avg_time_1: req.body.avg_time_1,
+						$avg_time_2: req.body.avg_time_2,
+						$avg_time_3: req.body.avg_time_3,
+						$n_correct_1: req.body.n_correct_1,
+						$n_correct_2: req.body.n_correct_2,
+						$n_correct_3: req.body.n_correct_3,
+						$raw: req.body.raw,
+						$deviceInfo: req.body.deviceInfo
 					}, function(ee){
 						if(ee){
 							console.log(ee);
@@ -275,6 +299,66 @@ app.post('/save-results', function(req,res){
 					});
 					break;
 			}
+		}
+	});
+});
+
+// This route handles requests for results
+// A valid request consists of a task ID (task_id), and:
+// 		before_time: the latest time a result could have been created
+// 		after_time: the earliest time a result could have been created
+// It returns a list of results satisfying
+app.get('/view-results', function(req,res){
+
+	var task_id = req.query.task_id;
+	var after_time = req.query.after_time;
+	var before_time = req.query.before_time;
+
+	console.log(after_time);
+	console.log(before_time);
+
+
+	// First we get the name of the table containing this task's detailed resutlts, by looking in TASK
+	db.get('SELECT RESULTS_TABLE_NAME FROM TASK WHERE ID = $task_id',{$task_id: task_id}, function(e,row){
+		if(e){
+			console.log(e)
+		} else {
+			var table = row.RESULTS_TABLE_NAME;
+			console.log("SELECT T.NAME, ST.NAME, datetime(ALL_RESULTS.FINISH_TIME), S.ID, S.RID, ALL_RESULTS.PID, DETAILED.RAW_RESULTS\n"
+			+ " FROM ALL_RESULTS\n"
+			+ "	JOIN "+table+" AS DETAILED\n"
+			+ "			ON ALL_RESULTS.ID = DETAILED.ID\n"
+			+ "		JOIN SESSION AS S\n"
+			+ "			ON ALL_RESULTS.SESSION_ID = S.ID\n"
+			+ "		JOIN TASK AS T\n"
+			+ "			ON S.TASK_ID = T.ID\n"
+			+ "		JOIN ALL_SETTINGS AS ST\n"
+			+ "			ON S.SETTING_ID = ST.ID\n"
+			+ " WHERE ALL_RESULTS.FINISH_TIME > datetime("+parseInt(after_time/1000)+",'unixepoch') \n"
+			+ " AND ALL_RESULTS.FINISH_TIME < datetime("+parseInt(before_time/1000)+", 'unixepoch');\n");
+
+			db.all(
+			"SELECT T.NAME AS TASK, ST.NAME AS SETTING, ST.ID AS SETTING_ID, datetime(ALL_RESULTS.FINISH_TIME) AS FINISH_TIME, S.ID AS SESSION_ID, S.RID, ALL_RESULTS.PID, ALL_RESULTS.ID AS RESULT_ID, DETAILED.RAW_RESULTS"
+			+ " FROM ALL_RESULTS"
+			+ "	JOIN "+ table +" AS DETAILED\n"
+			+ "			ON ALL_RESULTS.ID = DETAILED.ID\n"
+			+ "		JOIN SESSION AS S\n"
+			+ "			ON ALL_RESULTS.SESSION_ID = S.ID\n"
+			+ "		JOIN TASK AS T\n"
+			+ "			ON S.TASK_ID = T.ID\n"
+			+ "		JOIN ALL_SETTINGS AS ST\n"
+			+ "			ON S.SETTING_ID = ST.ID\n"
+			+ " WHERE ALL_RESULTS.FINISH_TIME > datetime("+parseInt(after_time/1000)+",'unixepoch')\n"
+			+ " AND ALL_RESULTS.FINISH_TIME < datetime("+parseInt(before_time/1000)+", 'unixepoch');",
+
+			function(err,rows){
+				if(err){
+					console.log(err);
+				} else {
+					console.log(rows);
+					res.send(rows);
+				}
+			});
 		}
 	});
 });
@@ -322,7 +406,6 @@ app.post('/new-stimulus', function(req,res){
 			});
 		}
 	});
-
 });
 
 app.post('/create-setting', function(req,res){
