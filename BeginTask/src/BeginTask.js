@@ -69,16 +69,28 @@ function SessionCreationController() {
 						$(PRESET_INPUT_SELECTOR).append(opt);
 						// TODO display summary of preset when selected
 					});
-				});	
+				});
 			}
 		});
 	};
 
 	this.createSession = function(){
-		
+		var task=$(TASK_INPUT_SELECTOR).val();
+		switch(task){
+			case TASK_NAME_HEARTSANDFLOWERS:
+			var task_id=1;
+			break;
+			case TASK_NAME_N_BACK:
+			var task_id=3;
+			break;
+			case TASK_NAME_CORSI:
+			var task_id=2;
+			break;
+		}
 		var data = {
 			setting_id: Number($(PRESET_INPUT_SELECTOR).val()),
-			rid: controller.rid
+			rid: controller.rid,
+			task_id:task_id
 		};
 		var form_data = new FormData();
 		for (key in data) {
@@ -94,7 +106,14 @@ function SessionCreationController() {
 		    	if (!response.success) {
 		    		// TODO CACHE RESULTS
 		    	} else {
-		    		window.location.href = "/HeartsAndFlowers.html?session_id="+response.session_id;
+						switch(task){
+							case TASK_NAME_HEARTSANDFLOWERS:
+							window.location.href = "/HeartsAndFlowers.html?session_id="+response.session_id;
+							break;
+							case TASK_NAME_N_BACK:
+							window.location.href = "/NBack.html?session_id="+response.session_id;
+							break;
+						}
 		    	}
 		    },
 		    error: function(errResponse) {
@@ -127,4 +146,3 @@ $(document).ready(function(){
 	scc = new SessionCreationController();
 	$(SETUP_MODAL_SELECTOR).modal('show');
 });
-

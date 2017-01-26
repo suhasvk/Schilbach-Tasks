@@ -9,6 +9,7 @@ TASK_NAME_CORSI = 'Corsi';
 TASK_NAME_N_BACK = 'N-Back';
 
 HF_TASK_ID = 1;
+N_BACK_ID =3;
 
 HF_FORMAT_SETTINGS = function(settings_row, query, response){
 	var heart_stimulus_path;
@@ -31,7 +32,7 @@ HF_FORMAT_SETTINGS = function(settings_row, query, response){
 					response.send({
 						query: query,
 						settings: [
-							{	
+							{
 								waitTime: Number(settings_row.WAIT_TIME	),
 								numberOfConditions:settings_row.PRACTICE_R1_LENGTH,
 								appearanceTime:Number(settings_row.APPEARANCE_TIME),
@@ -98,10 +99,45 @@ HF_FORMAT_SETTINGS = function(settings_row, query, response){
 						]
 					});
 				}
-			});	
-		}		
+			});
+		}
 	});
 }
+
+//NEED TO UNDO JSON>STRINGIFY ON STUFF
+
+NBACK_FORMAT_SETTINGS = function(settings_row, query, response){
+		response.send({
+			query:query,
+			settings:[
+				//practice settings
+				{
+					numBack:Number(settings_row.PRACTICE_N_BACK),
+					colors:JSON.parse(settings_row.PRACTICE_COLORS),
+					shapes:JSON.parse(settings_row.PRACTICE_SHAPES),
+					colorShapeDependence:settings_row.COLOR_SHAPE_DEPENDENT,
+					numStimuli:Number(settings_row.PRACTICE_LENGTH),
+					reqStimuli:JSON.parse(settings_row.PRACTICE_REQUIRED_STIMULI),
+					stimSeconds:Number(settings_row.PRACTICE_APPEARANCE_TIME),
+					waitSeconds:Number(settings_row.PRACTICE_ISI),
+					initialWaitTime:Number(settings_row.PRACTICE_INITIAL_WAIT_TIME)
+				},
+				//real settings
+				{
+					numBack:Number(settings_row.N_BACK),
+					colors:JSON.parse(settings_row.COLORS),
+					shapes:JSON.parse(settings_row.SHAPES),
+					colorShapeDependence:settings_row.COLOR_SHAPE_DEPENDENT,
+					numStimuli:Number(settings_row.LENGTH),
+					reqStimuli:JSON.parse(settings_row.REQUIRED_STIMULI),
+					stimSeconds:Number(settings_row.APPEARANCE_TIME),
+					waitSeconds:Number(settings_row.ISI),
+					initialWaitTime:Number(settings_row.INITIAL_WAIT_TIME)
+				}
+			]
+		});
+}
+
 
 const port = process.env.PORT || 8080;
 const express = require('express');
@@ -122,6 +158,7 @@ app.listen(port, function() {
 app.use(express.static('shared'));
 app.use(express.static('BeginTask'));
 app.use(express.static('HeartsAndFlowers'));
+app.use(express.static('NBack'));
 app.use(express.static('Settings'));
 app.use(express.static('Results'));
 
@@ -150,7 +187,7 @@ app.get('/validate-rid', function(req,res){
 });
 
 // Given a task id, this returns a list of all settings presets corresponding to that task
-// TODO fix to pull task-specific table name from database given task id 
+// TODO fix to pull task-specific table name from database given task id
 app.get('/settings-presets', function(req,res){
 	var task = req.query.task;
 	switch(task){
@@ -159,6 +196,14 @@ app.get('/settings-presets', function(req,res){
 				res.send({
 					query: req.query,
 					presets: rows
+				});
+			});
+			break;
+		case TASK_NAME_N_BACK:
+			db.all('SELECT * FROM N_BACK_SETTINGS', function(err,rows){
+				res.send({
+					query:req.query,
+					presets:rows
 				});
 			});
 			break;
@@ -190,7 +235,7 @@ app.post('/create-session', function(req,res){
 			db.run("INSERT INTO SESSION VALUES (NULL,$setting_id,$rid,$task_id,$creation_time)", {
 				$setting_id: req.body.setting_id,
 				$rid: req.body.rid,
-				$task_id: row.TASK_ID,
+				$task_id: req.body.task_id,
 				$creation_time: (new Date()).getTime()
 			}, function(error){
 				if (error){
@@ -231,34 +276,54 @@ app.get('/stimuli-list', function(req,res){
 	});
 });
 
+
+
 app.get('/initialize-session', function(req,res){
 	var setting_id;
 	var settings_table_name;
 	var task_id;
 	var settings_row;
+	/*
 	db.get("SELECT SESSION.SETTING_ID, TASK.SETTINGS_TABLE_NAME, ALL_SETTINGS.TASK_ID FROM SESSION INNER JOIN ALL_SETTINGS ON SESSION.SETTING_ID = ALL_SETTINGS.ID INNER JOIN TASK ON ALL_SETTINGS.TASK_ID = TASK.ID WHERE SESSION.ID = $session_id",{$session_id: req.query.session_id}, function(e,r){
 		if(e){
 			console.log(e);
 		} else {
 			setting_id = r.SETTING_ID;
 			settings_table_name = r.SETTINGS_TABLE_NAME;
-			task_id = r.TASK_ID;
-			db.get("SELECT * FROM "+settings_table_name+" where ID = $setting_id", {
-				$setting_id: setting_id
-			}, function (e2,r2){
-				if(e2){
-					console.log(e2);
-				} else {
-					settings_row = r2;
-					switch(task_id){
-						case HF_TASK_ID:
-							HF_FORMAT_SETTINGS(settings_row, req.query, res);
-							break;
-					}
+			task_id = r.TASK_ID;*/
+			db.get("SELECT SETTING_ID, TASK_ID FROM SESSION WHERE ID=$session_id",{$session_id: req.query.session_id},function(e,r){
+				if (e){
+					console.log(e);
+				}else{
+					setting_id=r.SETTING_ID;
+					task_id=r.TASK_ID;
+					db.get("SELECT SETTINGS_TABLE_NAME FROM TASK WHERE ID = $task_id",{$task_id: task_id}, function(e2,r2){
+						if (e2){
+							console.log(e2);
+						}else{
+							settings_table_name = r2.SETTINGS_TABLE_NAME;
+							db.get("SELECT * FROM "+settings_table_name+" where ID = $setting_id", {
+								$setting_id: setting_id
+							}, function (e3,r3){
+								if(e2){
+									console.log(e3);
+								} else {
+									settings_row = r3;
+									switch(task_id){
+										case HF_TASK_ID:
+											HF_FORMAT_SETTINGS(settings_row, req.query, res);
+											break;
+										case N_BACK_ID:
+											NBACK_FORMAT_SETTINGS(settings_row, req.query,res);
+											break;
+									}
+								}
+							});
+						}
+					});
 				}
 			});
-		}
-	});
+	//});
 });
 
 app.post('/save-results', function(req,res){
@@ -298,6 +363,23 @@ app.post('/save-results', function(req,res){
 						}
 					});
 					break;
+					case 3:
+						db.run("INSERT INTO N_BACK_RESULTS VALUES($id, $avgCorrectTime, $numMissed, $noResponse, $numCorrect,$rawResults, $deviceType)", {
+							$id: result_id,
+							$avgCorrectTime:req.body.averageCorrectTime,
+							$numMissed:req.body.numMissed,
+							$numCorrect:req.body.numCorrect,
+							$noResponse:req.body.noReponse,
+							$deviceType:req.body.deviceInfo,
+							$rawResults:req.body.raw
+						}, function(eee){
+							if(eee){
+								console.log(eee);
+								res.send({"success":false});
+							} else {
+								res.send({"success":true});
+							}
+						});
 			}
 		}
 	});
@@ -421,7 +503,7 @@ app.post('/create-setting', function(req,res){
 			var setting_id = this.lastID;
 			switch(task_id) {
 				case 1:
-					db.run("INSERT INTO HEARTS_AND_FLOWERS_SETTINGS VALUES ($ID,$PRACTICE_ISI_MIN,$PRACTICE_ISI_MAX,$APPEARANCE_TIME,$ISI_MIN,$ISI_MAX,$PRACTICE_R1_LENGTH,$PRACTICE_R2_LENGTH,$PRACTICE_R3_LENGTH,$R1_LENGTH,$R2_LENGTH,$R3_LENGTH,$STIMULUS_ID_HEART,$STIMULUS_ID_FLOWER,$NAME, 1000)", 
+					db.run("INSERT INTO HEARTS_AND_FLOWERS_SETTINGS VALUES ($ID,$PRACTICE_ISI_MIN,$PRACTICE_ISI_MAX,$APPEARANCE_TIME,$ISI_MIN,$ISI_MAX,$PRACTICE_R1_LENGTH,$PRACTICE_R2_LENGTH,$PRACTICE_R3_LENGTH,$R1_LENGTH,$R2_LENGTH,$R3_LENGTH,$STIMULUS_ID_HEART,$STIMULUS_ID_FLOWER,$NAME, 1000)",
 					{
 						$ID: req.body.ID,
 						$PRACTICE_ISI_MIN: req.body.PRACTICE_ISI_MIN,
@@ -453,6 +535,43 @@ app.post('/create-setting', function(req,res){
 						}
 					})
 					break;
+				case 3:
+					db.run("INSERT INTO N_BACK_SETTINGS VALUES ($ID,$PRACTICE_ISI,$PRACTICE_INITIAL_WAIT_TIME,$PRACTICE_APPEARANCE_TIME,$PRACTICE_LENGTH,$PRACTICE_COLORS,$PRACTICE_SHAPES,$PRACTICE_REQUIRED_STIMULI,$ISI,$INITIAL_WAIT_TIME,$APPEARANCE_TIME,$LENGTH,$COLORS,$SHAPES,$REQUIRED_STIMULI,$NAME,$N_BACK,$PRACTICE_N_BACK,$COLOR_SHAPE_DEPENDENT)",
+					{
+						$ID: req.body.ID,
+						$PRACTICE_ISI:req.body.PRACTICE_ISI,
+						$PRACTICE_INITIAL_WAIT_TIME: req.body.PRACTICE_INITIAL_WAIT_TIME,
+						$PRACTICE_APPEARANCE_TIME:req.body.PRACTICE_APPEARANCE_TIME,
+						$PRACTICE_LENGTH:req.body.PRACTICE_LENGTH,
+						$PRACTICE_COLORS:req.body.PRACTICE_COLORS,
+						$PRACTICE_SHAPES:req.body.PRACTICE_SHAPES,
+						$PRACTICE_REQUIRED_STIMULI:req.body.PRACTICE_REQUIRED_STIMULI,
+						$ISI:req.body.ISI,
+						$INITIAL_WAIT_TIME:req.body.INITIAL_WAIT_TIME,
+						$APPEARANCE_TIME: req.body.APPEARANCE_TIME,
+						$LENGTH: req.body.LENGTH,
+						$COLORS:req.body.COLORS,
+						$SHAPES:req.body.SHAPES,
+						$REQUIRED_STIMULI:req.body.REQUIRED_STIMULI,
+						$NAME: req.body.NAME,
+						$N_BACK:req.body.N_BACK,
+						$PRACTICE_N_BACK:req.body.PRACTICE_N_BACK,
+						$COLOR_SHAPE_DEPENDENT:req.body.COLOR_SHAPE_DEPENDENT
+					}, function(err){
+						if(err) {
+							console.log(err);
+							res.send({
+								success: false,
+								errorType: 'db-insert',
+								error: err
+							});
+						} else {
+							res.send({
+								success: true
+							});
+						}
+					})
+					break;
 			}
 		}
 	})
@@ -461,5 +580,3 @@ app.post('/create-setting', function(req,res){
 app.get('/', function(req, res) {
 	res.send('Hello World!');
 });
-
-

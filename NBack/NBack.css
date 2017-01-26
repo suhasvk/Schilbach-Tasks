@@ -1,0 +1,124 @@
+/*main css stuff*/
+/*main.css*/
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: "/lib/Open_Sans/OpenSans-Semibold.ttf" format("truetype");
+}
+
+.blocked {
+   color: #c2c2c2 !important; /* The important overrides the settings from bootstrap */
+   cursor: not-allowed;
+}
+
+.pane {
+	padding: 1em;
+	background: rgba(255,255,255,0);
+}
+
+.overlay-text {
+	font-size: 2em;
+	color: white;
+	text-align: left;
+}
+
+.blue-fill {
+	/*Opacity*/
+	opacity: 0;
+	-webkit-transition: opacity 1000ms ease;
+	-moz-transition: opacity 1000ms ease;
+	-o-transition: opacity 1000ms ease;
+	-ms-transition: opacity 1000ms ease;
+	transition: opacity 1000ms ease;
+
+	background: #1B5F92;
+}
+
+.instructions {
+	opacity: 0;
+	-webkit-transition: opacity 1000ms ease;
+	-moz-transition: opacity 1000ms ease;
+	-o-transition: opacity 1000ms ease;
+	-ms-transition: opacity 1000ms ease;
+	transition: opacity 1000ms ease;
+}
+
+.instructions.show {
+	opacity: 100;
+	-webkit-transition: opacity 1000ms ease;
+	-moz-transition: opacity 1000ms ease;
+	-o-transition: opacity 1000ms ease;
+	-ms-transition: opacity 1000ms ease;
+	transition: opacity 1000ms ease;
+}
+
+.instructionsImg{
+  width:100%;
+  padding-left:20px;
+  padding-right:20px;
+  padding-top: 20px;
+}
+
+#stimuliArea {
+  width: 800px;
+  height:100px;
+  position:absolute;
+  top:150px;
+  padding-left:20px;
+  
+}
+
+#gameArea {
+  border: 5px solid #000000;
+  /*Size*/
+  width: 800px;
+  height: 400px;
+
+  margin:auto;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  left:0;
+  right:0;
+}
+
+.arrow-up{
+  width:0;
+  height:0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom:30px solid green;
+}
+
+.rectangle-check {
+  color:green;
+  background-color: green;
+}
+
+
+.stimulus {
+  position: relative;
+}
+
+/*HARD CODED SHAPES*/
+.square {
+	width: 100px;
+	height: 100px;
+}
+
+.circle {
+	width: 100px;
+	height: 100px;
+	-moz-border-radius: 50px;
+	-webkit-border-radius: 50px;
+	border-radius: 50px;
+}
+
+.triangle {
+	width: 0;
+	height: 0;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-bottom: 100px solid;
+}
