@@ -16,7 +16,9 @@
 			session_id: q_data.session_id
 		}, function(data){
 		  nc = new NBackController(data.settings, q_data.session_id);
-		  $(END_TASK_MODAL_SELECTOR).modal('show');
+			nc.addEventListener(EVENT_END_SEQUENCE, function(data){
+				$(END_TASK_MODAL_SELECTOR).modal('show');
+			});
 		  console.log('Loaded settings.');
 		});
 
