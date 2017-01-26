@@ -33,7 +33,6 @@ EVENT_DELETE_STIM = 'deleteStim';
 
 //required stim (reqstim) has to be an array of objects with color and shape keys
 CreateStimuliList = function (colors, shapes, numStim, reqStim, colorShapeDependence){
-  console.log(reqStim);
   var conditionList = [];
   if (reqStim[0]['shape']=='null'){
     reqStim = [];

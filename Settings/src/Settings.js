@@ -242,7 +242,6 @@ var submit = function(){
 			}
 		});
 	}
-	console.log(data.get('TASK_ID'));
 
 	$.ajax({
 	    type: "POST",
