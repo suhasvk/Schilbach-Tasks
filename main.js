@@ -380,6 +380,7 @@ app.post('/save-results', function(req,res){
 								res.send({"success":true});
 							}
 						});
+					break;
 			}
 		}
 	});

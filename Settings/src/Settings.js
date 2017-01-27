@@ -434,4 +434,6 @@ $(document).ready(function(){
 		    }
 		});
 	});
+	//setup for initial page
+	populateSettings(HEARTS_AND_FLOWERS_SETTINGS_META);
 });
