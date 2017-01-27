@@ -5,15 +5,13 @@ var NBackController = function (opts, session_id){
   var numBack =0;
 
   var controller = this;
-  var results = [];
-  pResults = []; //practice results
+  this.results = [];
   var phase =-1;
 
   this.reset = function (){
     controller.game = null;
     controller.pid = null;
-    controller.results = null;
-    results = [];
+    controller.results = [];
     phase =-1;
   }
 
@@ -379,9 +377,9 @@ var NBackController = function (opts, session_id){
 
   this.end = function (){
     controller.dispatchEvent(EVENT_END_SEQUENCE, {
-      results: results,
+      results: controller.results,
       options: opts,
-      displayResults: controller.formatResults(results)
+      displayResults: controller.formatResults(controller.results)
     });
   }
 
@@ -404,10 +402,10 @@ var NBackController = function (opts, session_id){
 			pid: controller.pid,
 			task_id: NBACK_TASK_ID,
 			resultData: {
-				numCorrect: controller.results[results.length-1].numCorrect,
-				averageCorrectTime: controller.results[results.length-1].avgCorrectTime,
-        numMissed:controller.results[results.length-1].numMissed,
-        noResponse:controller.results[results.length-1].noResponse,
+				numCorrect: controller.results.numCorrect,
+				averageCorrectTime: controller.results.avgCorrectTime,
+        numMissed:controller.results.numMissed,
+        noResponse:controller.results .noResponse,
 				deviceInfo: navigator.userAgent,
 				raw: JSON.stringify(controller.results)
 			}
@@ -445,7 +443,9 @@ var NBackController = function (opts, session_id){
   }
 
   this.addResults = function(data){
-    (phase==1)?results.push(data):pResults.push(data);
+    if (phase==1){
+      controller.results.push(data);
+    }
   }
 
   $(window).keydown(function(evt, err){

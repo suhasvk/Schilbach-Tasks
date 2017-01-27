@@ -17,6 +17,16 @@
 		}, function(data){
 		  nc = new NBackController(data.settings, q_data.session_id);
 			nc.addEventListener(EVENT_END_SEQUENCE, function(data){
+				for (category in data.displayResults) {
+					var block = document.createElement('p');
+					$(block).append('<strong>'+category+'</strong>')
+					for (item in data.displayResults[category]) {
+						var line = item+': '+data.displayResults[category][item];
+						block.appendChild(document.createElement('br'));
+						block.appendChild(document.createTextNode(line));
+					}
+					$(RESULTS_AREA_SELECTOR).append(block);
+				}
 				$(END_TASK_MODAL_SELECTOR).modal('show');
 			});
 		  console.log('Loaded settings.');
