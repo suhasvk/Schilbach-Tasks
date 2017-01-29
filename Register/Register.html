@@ -1,0 +1,47 @@
+<!-- main.html -->
+<!DOCTYPE html5>
+<html>
+	<head>
+
+		<script src="lib/jquery/jquery.min.js"></script>
+		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+		<script src="src/Register.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css"/>
+	</head>
+	<body>
+		<div class="modal fade" id="registerRidModal" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<a class="close" data-dismiss="modal">&times;</a>
+						<h3>Register surveyor</h3>
+					</div>
+					<div class="modal-body">
+						<fieldset class="form inputNamePaneItem" role="form">
+	                  		<div class="form-group" id="nameFormGroup">
+			                    <label  class="control-label" for="nameInput">Enter surveyor name</label>
+		                        <input type="text" class="form-control" id="nameInput"></input>
+		                        <span class="glyphicon glyphicon-remove form-control-feedback hidden">
+		                        </span>
+		                        <div class="help-block hidden">Enter surveyor's name in order to generate a new R.I.D.
+								</div>
+	                 		</div>
+		                </fieldset>
+		                <div class="container viewRidPaneItem hidden">
+		                	<h4>Success!</h4>
+		                	<h4>Surveyor name: <strong id="surveyorName"></strong></h4>
+		                	<h4>Assigned R.I.D.: <strong id="assignedRid"></strong></h4>
+		                </div>
+					</div>
+					<div class="modal-footer">
+						<a id="generateRidButton" class="btn btn-primary inputNamePaneItem">Generate R.I.D.</a>
+						<a id="exitButton" href="#" class="btn" data-dismiss="modal">Exit</a>
+						<a id="chooseSettingsButton" href="/Register.html" class="btn btn-primary viewRidPaneItem hidden">Register another surveyor</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>
