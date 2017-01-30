@@ -161,13 +161,10 @@ app.use(express.static('HeartsAndFlowers'));
 app.use(express.static('NBack'));
 app.use(express.static('Settings'));
 app.use(express.static('Results'));
+app.use(express.static('Register'));
 
 app.get('/language', function(req,res){
 	// TODO get translations mapping
-});
-
-app.post('/register-surveyor', function(req,res){
-	// TODO add surveyor
 });
 
 app.get('/validate-rid', function(req,res){
@@ -275,7 +272,6 @@ app.get('/stimuli-list', function(req,res){
 		});
 	});
 });
-
 
 
 app.get('/initialize-session', function(req,res){
@@ -386,6 +382,23 @@ app.post('/save-results', function(req,res){
 	});
 });
 
+app.post('/register-surveyor', function(req,res){
+	db.run("INSERT INTO SURVEYOR VALUES (NULL, $name)",{$name: req.body.surveyor_name}, function(err){
+		if(err){
+			console.log(err);
+			res.send({
+				success:false
+			});
+		} else {
+			res.send({
+				success:true,
+				RID:this.lastID,
+				name:req.body.surveyor_name
+			})
+		}
+	});
+});
+
 // This route handles requests for results
 // A valid request consists of a task ID (task_id), and:
 // 		before_time: the latest time a result could have been created
@@ -492,6 +505,7 @@ app.post('/new-stimulus', function(req,res){
 });
 
 app.post('/create-setting', function(req,res){
+	console.log(req.body);
 	var setting_name = req.body.NAME;
 	var task_id = Number(req.body.TASK_ID);
 	db.run("INSERT INTO ALL_SETTINGS VALUES (NULL, $name, $id)", {

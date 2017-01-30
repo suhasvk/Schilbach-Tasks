@@ -358,13 +358,15 @@ var tasklist = ['Hearts and Flowers', 'Corsi', 'NBack'];
 $(document).ready(function(){
 	$(SETTINGS_MODAL_SELECTOR).modal('show');
 
+	// Placeholder option--necessary because settings selection is only triggered by change
+	$(TASK_INPUT_SELECTOR).append(document.createElement("option"));
 
-  for (var i in tasklist){
-    var opt = document.createElement("option");
-    opt.value= Number(i)+1;
-    opt.text = tasklist[i];
-    $(TASK_INPUT_SELECTOR).append(opt);
-  }
+	for (var i in tasklist){
+		var opt = document.createElement("option");
+		opt.value= Number(i)+1;
+		opt.text = tasklist[i];
+		$(TASK_INPUT_SELECTOR).append(opt);
+	}
 
 
 	$(STIMULUS_FILE_INPUT_BUTTON_SELECTOR).change(function(){
@@ -388,7 +390,7 @@ $(document).ready(function(){
 		switch(task_id){
 			case 1:
 				populateSettings(HEARTS_AND_FLOWERS_SETTINGS_META);
-        break;
+        		break;
 			case 2:
 				break;
 			case 3:
@@ -400,6 +402,7 @@ $(document).ready(function(){
 
 	$(SUBMIT_SETTINGS_BUTTON_SELECTOR).click(function(ev,er){
 		submit();
+		// location.reload();
 	});
 
 	$("form[action='/new-stimulus']").submit(function(ev,er){
