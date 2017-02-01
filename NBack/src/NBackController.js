@@ -11,7 +11,7 @@ var NBackController = function (opts, session_id){
   this.reset = function (){
     controller.game = null;
     controller.pid = null;
-    controller.results = [];
+    controller.results = null;
     phase =-1;
   }
 
@@ -385,9 +385,9 @@ var NBackController = function (opts, session_id){
 
   this.formatResults = function(results){
     return {
-      'Fraction Correct':results[results.length-1].numCorrect + '/'+ results[results.length-1].numStimuli,
-      'Average Correct Response Time':(results[results.length-1].avgCorrectTime === NaN ? 'N/A' : results[results.length-1].avgCorrectTime + ' milliseconds'),
-      'Score':controller.score(results[results.length-1].numCorrect)
+      'Fraction Correct':results.numCorrect + '/'+ results.numStimuli,
+      'Average Correct Response Time':(results.avgCorrectTime === NaN ? 'N/A' : results.avgCorrectTime + ' milliseconds'),
+      'Score':controller.score(results.numCorrect)
     }
   }
 
@@ -401,14 +401,12 @@ var NBackController = function (opts, session_id){
 			session_id: controller.session_id,
 			pid: controller.pid,
 			task_id: NBACK_TASK_ID,
-			resultData: {
-				numCorrect: controller.results.numCorrect,
-				averageCorrectTime: controller.results.avgCorrectTime,
-        numMissed:controller.results.numMissed,
-        noResponse:controller.results .noResponse,
-				deviceInfo: navigator.userAgent,
-				raw: JSON.stringify(controller.results)
-			}
+			numCorrect: controller.results.numCorrect,
+			averageCorrectTime: controller.results.avgCorrectTime,
+      numMissed:controller.results.numWrong,
+      noResponse:controller.results.noResponse,
+			deviceInfo: navigator.userAgent,
+			raw: JSON.stringify(controller.results)
 		};
 
 		var form_data = new FormData();
@@ -444,7 +442,7 @@ var NBackController = function (opts, session_id){
 
   this.addResults = function(data){
     if (phase==1){
-      controller.results.push(data);
+      controller.results=data;
     }
   }
 
