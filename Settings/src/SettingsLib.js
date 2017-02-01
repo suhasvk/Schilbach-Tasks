@@ -93,7 +93,7 @@ N_BACK_SETTINGS_META = {
 			"validation":"integer"
 		},
 		{
-			"display":"Number of rounds",
+			"display":"Round length",
 			"column":"LENGTH",
 			"type":"input",
 			"validation":"integer"
@@ -126,7 +126,7 @@ N_BACK_SETTINGS_META = {
 			"validation":"integer"
 		},
 		{
-			"display":"Number of rounds",
+			"display":"Round length",
 			"column":"PRACTICE_LENGTH",
 			"type":"input",
 			"validation":"integer"

@@ -242,7 +242,6 @@ var submit = function(){
 			}
 		});
 	}
-	console.log(data.get('TASK_ID'));
 
 	$.ajax({
 	    type: "POST",
@@ -438,4 +437,6 @@ $(document).ready(function(){
 		    }
 		});
 	});
+	//setup for initial page
+	populateSettings(HEARTS_AND_FLOWERS_SETTINGS_META);
 });
