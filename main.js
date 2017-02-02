@@ -104,8 +104,6 @@ HF_FORMAT_SETTINGS = function(settings_row, query, response){
 	});
 }
 
-//NEED TO UNDO JSON>STRINGIFY ON STUFF
-
 NBACK_FORMAT_SETTINGS = function(settings_row, query, response){
 		response.send({
 			query:query,
@@ -365,7 +363,7 @@ app.post('/save-results', function(req,res){
 							$avgCorrectTime:req.body.averageCorrectTime,
 							$numMissed:req.body.numMissed,
 							$numCorrect:req.body.numCorrect,
-							$noResponse:req.body.noReponse,
+							$noResponse:req.body.noResponse,
 							$deviceType:req.body.deviceInfo,
 							$rawResults:req.body.raw
 						}, function(eee){

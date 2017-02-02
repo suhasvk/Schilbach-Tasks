@@ -20,11 +20,8 @@
 				for (category in data.displayResults) {
 					var block = document.createElement('p');
 					$(block).append('<strong>'+category+'</strong>')
-					for (item in data.displayResults[category]) {
-						var line = item+': '+data.displayResults[category][item];
-						block.appendChild(document.createElement('br'));
-						block.appendChild(document.createTextNode(line));
-					}
+					var text =": "+data.displayResults[category];
+					$(block).append(text);
 					$(RESULTS_AREA_SELECTOR).append(block);
 				}
 				$(END_TASK_MODAL_SELECTOR).modal('show');
