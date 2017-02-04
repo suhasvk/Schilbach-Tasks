@@ -160,12 +160,15 @@ NBackTask = function(ID, opts){
       noResponse:noResponse,
       avgResponseTime: avgResponseTime,
       avgCorrectTime:correctAvgResponseTime,
-      avgWrongTime:wrongAvgResponseTime
+      avgWrongTime:wrongAvgResponseTime,
+      rawResults: pResults
     }
   }
 
   this.resultsSummary = function(){
-    return task.tallyResults(results);
+    var resultsSum = task.tallyResults(results);
+    resultsSum['rawResults']=task.tallyResults(results);
+    return resultsSum;
   }
 
   ////////////////////////////

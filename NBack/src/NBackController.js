@@ -406,7 +406,8 @@ var NBackController = function (opts, session_id){
       numMissed:controller.results.numWrong,
       noResponse:controller.results.noResponse,
 			deviceInfo: navigator.userAgent,
-			raw: JSON.stringify(controller.results)
+			raw: JSON.stringify(controller.results.rawResults),
+      time: parseInt((new Date()).getTime()/1000)
 		};
 
 		var form_data = new FormData();

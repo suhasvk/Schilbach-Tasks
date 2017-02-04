@@ -218,6 +218,12 @@ app.get('/view-setting', function(req,res){
 				res.send(setting);
 			});
 			break;
+		case TASK_NAME_N_BACK:
+			db.get("SELECT * FROM N_BACK_SETTINGS WHERE ID=$id", {$id:setting_id},function(err,setting){
+				console.log(setting);
+				res.send(setting);
+			});
+		break;
 	}
 });
 

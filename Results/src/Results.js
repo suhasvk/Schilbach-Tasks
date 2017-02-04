@@ -59,7 +59,7 @@ const FORMAT_AND_DISPLAY_SETTINGS_HF = function(setting_id) {
 	console.log('we in here!')
 	// This gets the settings info for hearts and flowers settings
 	var setting_data = {
-		task: TASK_NAME_HEARTSANDFLOWERS, 
+		task: TASK_NAME_HEARTSANDFLOWERS,
 		setting_id:setting_id
 	};
 
@@ -69,7 +69,7 @@ const FORMAT_AND_DISPLAY_SETTINGS_HF = function(setting_id) {
 			'Time Settings':{
 				'Minimum ISI': data.ISI_MIN,
 				'Maximum ISI': data.ISI_MAX,
-				'Appearance Time': data.APPEARANCE_TIME 
+				'Appearance Time': data.APPEARANCE_TIME
 			},
 			'Round Lengths':{
 				'Hearts Only': data.R1_LENGTH,
@@ -96,8 +96,84 @@ const FORMAT_AND_DISPLAY_SETTINGS_HF = function(setting_id) {
 		});
 };
 
+const FORMAT_AND_DISPLAY_RESULTS_NBACK = function(results, id){
+	console.log(results);
+	var displayResults = {
+		"Fraction Correct":results.numCorrect+'/'+results.numStimuli,
+		"Average Correct Response Time":(results.avgCorrectTime),
+	}
+	for (category in displayResults) {
+		var block = document.createElement('p');
+		$(block).append('<strong>'+category+'</strong>')
+		var text =": "+displayResults[category];
+		$(block).append(text);
+		$(INFO_AREA_ID_SELECTOR).append(block);
+	}
+	$(CLOSE_INFO_MODAL_BUTTON_ID_SELECTOR).click(function(ev,er){
+		$(INFO_MODAL_TITLE_ID_SELECTOR).empty();
+		$(INFO_AREA_ID_SELECTOR).empty();
+	});
+	$(INFO_MODAL_ID_SELECTOR).modal('show');
+}
+const FORMAT_AND_DISPLAY_SETTINGS_NBACK = function(setting_id) {
+	console.log('we in here')
+	// This gets the settings info for hearts and flowers settings
+	var setting_data = {
+		task: TASK_NAME_N_BACK,
+		setting_id:setting_id
+	};
+
+	$.get('/view-setting', setting_data, function(data){
+		console.log(data);
+		var displaySettings = {};
+		displaySettings['Settings']={
+				'ISI': data.ISI,
+				'Appearance Time': data.APPEARANCE_TIME,
+				'N': data.N_BACK,
+				'Round Length':data.LENGTH,
+				'Initial Wait Time':data.INITIAL_WAIT_TIME
+		};
+		if (data.COLOR_SHAPE_DEPENDENT){
+			var stimList = '';
+			var colors = JSON.parse(data.COLORS);
+			var shapes = JSON.parse(data.SHAPES);
+			for (i=0;i<colors.length;i++){
+				var stim = ((i!=0)?', ':'')+colors [i]+ ' '+shapes[i];
+				stimList.push(stim);
+			}
+			displaySettings['Stimuli']=stimList
+	}else{
+		displaySettings['Stimuli']=
+		{
+			'Colors': JSON.parse(data.COLORS),
+			'Shapes': JSON.parse(data.SHAPES),
+		};
+	};
+		for (category in displaySettings) {
+			var block = document.createElement('p');
+			$(block).append('<strong>'+category+'</strong>')
+			if (data.COLOR_SHAPE_DEPENDENT && category == "Stimuli"){
+				var line = displaySettings[category];
+			}else{
+				for (item in displaySettings[category]) {
+					var line = item+': '+displaySettings[category][item];
+					block.appendChild(document.createElement('br'));
+					block.appendChild(document.createTextNode(line));
+				}
+			}
+			$(INFO_AREA_ID_SELECTOR).append(block);
+		}
+		$(INFO_MODAL_TITLE_ID_SELECTOR).text("Setting "+setting_id);
+		$(CLOSE_INFO_MODAL_BUTTON_ID_SELECTOR).click(function(ev,er){
+			$(INFO_MODAL_TITLE_ID_SELECTOR).empty();
+			$(INFO_AREA_ID_SELECTOR).empty();
+		});
+		$(INFO_MODAL_ID_SELECTOR).modal('show');
+		});
+};
+
 $(document).ready(function(){
-	
+
     $(AFTER_DATE_TIME_PICKER_ID_SELECTOR).datetimepicker();
     $(BEFORE_DATE_TIME_PICKER_ID_SELECTOR).datetimepicker();
 	$('#selectionModal').modal('show');
@@ -112,20 +188,20 @@ $(document).ready(function(){
 	});
 
 	$(VIEW_RESULTS_BUTTON_ID_SELECTOR).click(function(evt,err){
-		
+
 		var raw_before_time = (new Date($(BEFORE_DATE_TIME_PICKER_ID_SELECTOR).data('DateTimePicker').date())).getTime();
 		var raw_after_time = (new Date($(AFTER_DATE_TIME_PICKER_ID_SELECTOR).data('DateTimePicker').date())).getTime();
 
 		// If the input for before_time is blank, pass through value corresponding to the present time
-		var before_time = 
-			($(BEFORE_DATE_TIME_PICKER_ID_SELECTOR).children('input').val() === "") ? 
-				(new Date()).getTime() : 
+		var before_time =
+			($(BEFORE_DATE_TIME_PICKER_ID_SELECTOR).children('input').val() === "") ?
+				(new Date()).getTime() :
 				raw_before_time;
 
 		// If the input for before_time is blank, pass through value corresponding to beginning of (computer) time
-		var after_time = 
-			($(AFTER_DATE_TIME_PICKER_ID_SELECTOR).children('input').val() === "") ? 
-				(new Date(0)).getTime() : 
+		var after_time =
+			($(AFTER_DATE_TIME_PICKER_ID_SELECTOR).children('input').val() === "") ?
+				(new Date(0)).getTime() :
 				raw_after_time;
 
 		var input_data = {
@@ -140,7 +216,7 @@ $(document).ready(function(){
 		$('#selectionModal').modal('hide');
 
 		$.get('/view-results',input_data,function(data){
-			
+
 
 			// Make a column header each column specified in the RESULTS_META list
 			$.each(RESULTS_META, function(i, val){
@@ -167,9 +243,14 @@ $(document).ready(function(){
 								case 1:
 									FORMAT_AND_DISPLAY_RESULTS_HF(JSON.parse(result["RAW_RESULTS"]), result["RESULT_ID"]);
 									break;
+								case 3:
+								console.log('here!');
+								console.log(result);
+									FORMAT_AND_DISPLAY_RESULTS_NBACK(JSON.parse(result.RAW_RESULTS),result['RESULT_ID']);
+									break;
 							}
 						});
-					} 
+					}
 
 					else if (field["column"]=="SETTING") {
 						// create link to display settings summary
@@ -184,6 +265,10 @@ $(document).ready(function(){
 									console.log('did!')
 									console.log(result["SETTING_ID"]);
 									FORMAT_AND_DISPLAY_SETTINGS_HF(result["SETTING_ID"]);
+									break;
+								case 3:
+									console.log('here?');
+									FORMAT_AND_DISPLAY_SETTINGS_NBACK(result["SETTING_ID"])
 									break;
 							}
 						})
