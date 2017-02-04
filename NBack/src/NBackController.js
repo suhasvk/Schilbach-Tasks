@@ -125,19 +125,20 @@ var NBackController = function (opts, session_id){
         controller.deleteBlock(false);
         $(INSTRUCTIONS_TEXT_AREA_SELECTOR)
         .html('<p>'+text2+'</p>');
-        var redCircle = {color:'red', shape:'circle'};
-        var blueSquare = {color:'blue', shape:'square'};
-        var greenCircle = {color:'green', shape:'circle'};
+
           //depending on numBack, create a list with a hit
-          switch(numBack){
+          switch(numBack){ //FIX
             case 1:
-            var stimList = [blueSquare, redCircle, redCircle];
+            var stimList=CreateStimuliList(controller.opts[0].colors,controller.opts[0].shapes,2,[],controller.opts[0].colorShapeDependence);
+            stimList[2]=stimList[1];
             break;
             case 2:
-            var stimList = [greenCircle, blueSquare, redCircle, blueSquare];
+            var stimList = CreateStimuliList(controller.opts[0].colors,controller.opts[0].shapes,3,[],controller.opts[0].colorShapeDependence);
+            stimList[3]=stimList[1];
             break;
             case 3:
-            var stimList = [redCircle, blueSquare, greenCircle, redCircle];
+            var stimList = CreateStimuliList(controller.opts[0].colors,controller.opts[0].shapes,4,[],controller.opts[0].colorShapeDependence);
+            stimList[4]=stimList[1]
             break;
           }
         controller.exampleHit(stimList, true);
@@ -174,34 +175,21 @@ var NBackController = function (opts, session_id){
     controller.deleteBlock(false);
     $('.check').empty().remove();
 
-    var redCircle = {color:'red', shape:'circle'};
-    var blueSquare = {color:'blue', shape:'square'};
-    var greenCircle = {color:'green', shape:'circle'};
-      //depending on numBack, create a list with a hit
-      switch(numBack){
-        case 1:
-        var stimList = [blueSquare, redCircle];
-        break;
-        case 2:
-        var stimList = [greenCircle, blueSquare, redCircle];
-        break;
-        case 3:
-        var stimList = [redCircle, blueSquare, greenCircle, blueSquare];
-        break;
-      }
-      controller.exampleHit(stimList, false)
+    var stimList = RandomNoHitList(controller.opts[0].colors, controller.opts[0].shapes, numBack, controller.opts[0].colorShapeDependence);
 
-      setTimeout(function(){ //lets the user
-        $(INSTRUCTIONS_TEXT_AREA_SELECTOR)
-        .html('<p>'+text3+' Press space to continue.</p>');
-        var enterHandler = function(event){
-          if (event.keyCode==32){
-            setTimeout(controller.introPartThree(game),1000);
-            $(window).off('keydown', enterHandler)
-          }
+    controller.exampleHit(stimList, false)
+
+    setTimeout(function(){ //lets the user
+      $(INSTRUCTIONS_TEXT_AREA_SELECTOR)
+      .html('<p>'+text3+' Press space to continue.</p>');
+      var enterHandler = function(event){
+        if (event.keyCode==32){
+          setTimeout(controller.introPartThree(game),1000);
+          $(window).off('keydown', enterHandler)
         }
-        $(window).on('keydown', enterHandler);
-      }, 12000);
+      }
+      $(window).on('keydown', enterHandler);
+    }, 12000);
   }
 
   controller.introPartThree = function(game){
@@ -229,12 +217,9 @@ var NBackController = function (opts, session_id){
 
   //flashes stimuli on screen. takes
   this.showExampleStimuli = function (){
-    var redCircle = {color:'red', shape:'circle'};
-    var blueSquare = {color:'blue', shape:'square'};
-    var greenCircle = {color:'green', shape:'circle'};
-    var redSquare = {color:'red',shape:'square'};
+    //needs to change to be same as shapes for practice/real game
 
-    var stimList = [redCircle, blueSquare, greenCircle, redSquare];
+    var stimList = CreateStimuliList(controller.opts[0].colors,controller.opts[0].shapes,5,[],controller.opts[0].colorShapeDependence);
     for (i = 0; i<stimList.length; i++){
       color = stimList[i]["color"];
       shape = stimList[i]["shape"];
@@ -244,7 +229,7 @@ var NBackController = function (opts, session_id){
       }, INSTRUCTIONS_IMAGE_AREA_SELECTOR);
     }
     $(ALL_STIMULI_SELECTOR)
-    .css('left', 325)
+    .css('left', (1200/2-75))
     .hide()
     .each(function(index, elem){
       setTimeout(function(){ //puts all shapes out there with breaks in between.
@@ -316,7 +301,7 @@ var NBackController = function (opts, session_id){
   this.getSpacing = function(location){
     var length = $(ALL_STIMULI_SELECTOR).length
     var width = $(location).width();
-    return (width/2 - 100*(length)-50);
+    return (width/2 - 150*(length)-75);
   }
 
   this.createCheck = function (isHit, waitTime){
@@ -334,16 +319,16 @@ var NBackController = function (opts, session_id){
       $(lead).addClass('rectangle-check');
       $(arm).addClass('rectangle-check');
       //constants. Set width and heighth of check
-      var width = 10;
+      var width = 15;
       var totalOffsetBlock = $(ALL_STIMULI_SELECTOR).get(0);
-      var totalOffset = $(totalOffsetBlock).position().left + width;
-      var borderBottom = 20;
-      var leftOffset = borderBottom/2+width/2;
+      var totalOffset = 50;//$(totalOffsetBlock).position().left + width;
+      var borderBottom = 30;
+      var leftOffset = borderBottom/2 + width/2;
       //pointer setup
       $(pointer).css('border-left', width + ' solid transparent').css('border-right', width + ' solid transparent');
       $(pointer).css('borderBottom', borderBottom + ' solid green');
       //lead setup (thing just before pointer)
-      var leadHeight = 30;
+      var leadHeight = 45;
       $(lead).css('margin', '0 '+leftOffset).width(width).height(leadHeight);
       //base setup (bottom)
       var baseWidth = controller.tutorialSpacing()+width;
@@ -351,7 +336,7 @@ var NBackController = function (opts, session_id){
       //arm setup (from current block)
       var armHeightMargin = -($(lead).height() + borderBottom + $(base).height());
       var armHeight = $(lead).height() + borderBottom;
-      var armWidthMargin = $(base).width()+width/2;
+      var armWidthMargin = $(base).width() + width/2;
       $(arm).height(armHeight)
       $(arm).width(width)
       $(arm).css('margin', armHeightMargin + ' ' + armWidthMargin)
@@ -363,8 +348,8 @@ var NBackController = function (opts, session_id){
         var X = document.createElement('div');
         var XMarginLeft = baseWidth/2 + leftOffset;
 
-        $(X).html('X'.bold()).css('color', 'red').css('font-size', 40)
-        var XMarginTop = leadHeight+width/2+borderBottom-$(X).height()-26.67/2-width/2;
+        $(X).html('X'.bold()).css('color', 'red').css('font-size', 60)
+        var XMarginTop = leadHeight+width/2+borderBottom-$(X).height()-20-width/2;
         $(X).css('margin', XMarginTop +' '+XMarginLeft)
         $(arrow).append(X);
       }
@@ -384,10 +369,35 @@ var NBackController = function (opts, session_id){
   }
 
   this.formatResults = function(results){
+    var rawRes = results.rawResults.rawResults[results.rawResults.rawResults.length-1];
+    var rawResList = results.rawResults.rawResults;
+    var totalMatches = 0;
+    var totalNoMatches = 0;
+    var avgMatchTime=0;
+    var avgNoMatchTime=0;
+    for (var i =0; i<rawResList.length-1;i++){
+      if (rawResList[i].responseTime){
+        if (rawResList[i].isHit){
+          avgMatchTime+=rawResList[i].responseTime;
+          totalMatches+=1
+        }else{
+          avgNoMatchTime+=rawResList[i].responseTime;
+          totalNoMatches+=1;
+        }
+      }
+    }
     return {
-      'Fraction Correct':results.numCorrect + '/'+ results.numStimuli,
-      'Average Correct Response Time':(results.avgCorrectTime === NaN ? 'N/A' : results.avgCorrectTime + ' milliseconds'),
-      'Score':controller.score(results.numCorrect)
+      'Matching Stimuli Results':{
+        'Fraction Correct':rawRes.numCorrectsYes + '/'+ totalMatches,
+        'Average Response Time':avgMatchTime+'/'+totalMatches,
+      },
+      'Non-Matching Stimuli Results':{
+        'Fraction Correct':rawRes.numCorrectNo+'/'+totalNoMatches,
+        'Average Response Time':avgNoMatchTime+'/'+totalNoMatches,
+      },
+      'Total Results':{
+        'Score':controller.score(results.numCorrect) //need to fix. no score in settings right now so this function doesnt work
+      }
     }
   }
 
@@ -434,6 +444,9 @@ var NBackController = function (opts, session_id){
 	}
 
   this.endGame = function(){
+    //maybe do a special thing for tutorial so if they get too low of a score,
+    //offer up the opportunity to start over
+
     if (phase==opts.length-1){
       this.end();
     }else{

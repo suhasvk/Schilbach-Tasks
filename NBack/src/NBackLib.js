@@ -34,7 +34,7 @@ EVENT_DELETE_STIM = 'deleteStim';
 //required stim (reqstim) has to be an array of objects with color and shape keys
 CreateStimuliList = function (colors, shapes, numStim, reqStim, colorShapeDependence){
   var conditionList = [];
-  if (reqStim[0]['shape']=='null'){
+  if (reqStim.length==1&&reqStim[0]['shape']=='null'){
     reqStim = [];
   }
   if (colorShapeDependence) {
@@ -107,4 +107,20 @@ HitList = function (colorList, numBack){
     }
   }
   return hit_list;
+}
+
+RandomNoHitList = function (colorList, shapeList, numBack, colorShapeDependence){
+  var good = false;
+  var length=numBack+2;
+  var stimList= [];
+  while (!good){
+    good =true;
+    stimList = CreateStimuliList(colorList, shapeList, length, [], colorShapeDependence);
+    for (var i=0; i<2; i++){
+      if (stimList[i]['color']==stimList[i+numBack]['color']){
+        good = false;
+      }
+    }
+  }
+  return stimList;
 }

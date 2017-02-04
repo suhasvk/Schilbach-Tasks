@@ -61,18 +61,18 @@
 }
 
 #stimuliArea {
-  width: 800px;
-  height:100px;
+  width: 1200px;
+  height:150px;
   position:absolute;
-  top:150px;
+  top:200px;
   padding-left:20px;
 }
 
 #gameArea {
   border: 5px solid #000000;
   /*Size*/
-  width: 800px;
-  height: 400px;
+  width: 1200px;
+  height: 600px;
 
   margin:auto;
   position: absolute;
@@ -85,9 +85,9 @@
 .arrow-up{
   width:0;
   height:0;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-bottom:30px solid green;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-bottom:40px solid green;
 }
 
 .rectangle-check {
@@ -102,22 +102,22 @@
 
 /*HARD CODED SHAPES*/
 .square {
-	width: 100px;
-	height: 100px;
+	width: 150px;
+	height: 150px;
 }
 
 .circle {
-	width: 100px;
-	height: 100px;
-	-moz-border-radius: 50px;
-	-webkit-border-radius: 50px;
-	border-radius: 50px;
+	width: 150px;
+	height: 150px;
+	-moz-border-radius: 75px;
+	-webkit-border-radius: 75px;
+	border-radius: 75px;
 }
 
 .triangle {
 	width: 0;
 	height: 0;
-	border-left: 50px solid transparent;
-	border-right: 50px solid transparent;
-	border-bottom: 100px solid;
+	border-left: 75px solid transparent;
+	border-right: 75px solid transparent;
+	border-bottom: 150px solid;
 }
