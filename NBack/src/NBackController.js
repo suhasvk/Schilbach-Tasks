@@ -369,31 +369,33 @@ var NBackController = function (opts, session_id){
   }
 
   this.formatResults = function(results){
-    var rawRes = results.rawResults.rawResults[results.rawResults.rawResults.length-1];
+    var rawRes = results.rawResults;
     var rawResList = results.rawResults.rawResults;
+    console.log(rawResList);
     var totalMatches = 0;
     var totalNoMatches = 0;
     var avgMatchTime=0;
     var avgNoMatchTime=0;
-    for (var i =0; i<rawResList.length-1;i++){
-      if (rawResList[i].responseTime){
-        if (rawResList[i].isHit){
-          avgMatchTime+=rawResList[i].responseTime;
-          totalMatches+=1
+    for (var i =0; i<rawResList.length;i++){
+      console.log(rawResList[i]);
+      if (rawResList[i].ResponseTime){
+        if (rawResList[i].Hit){
+          avgMatchTime+=rawResList[i].ResponseTime;
+          totalMatches+=1;
         }else{
-          avgNoMatchTime+=rawResList[i].responseTime;
+          avgNoMatchTime+=rawResList[i].ResponseTime;
           totalNoMatches+=1;
         }
       }
     }
     return {
       'Matching Stimuli Results':{
-        'Fraction Correct':rawRes.numCorrectsYes + '/'+ totalMatches,
-        'Average Response Time':avgMatchTime+'/'+totalMatches,
+        'Fraction Correct':rawRes.numCorrectYes + '/'+ totalMatches,
+        'Average Response Time':avgMatchTime/totalMatches,
       },
       'Non-Matching Stimuli Results':{
         'Fraction Correct':rawRes.numCorrectNo+'/'+totalNoMatches,
-        'Average Response Time':avgNoMatchTime+'/'+totalNoMatches,
+        'Average Response Time':avgNoMatchTime/totalNoMatches,
       },
       'Total Results':{
         'Score':controller.score(results.numCorrect) //need to fix. no score in settings right now so this function doesnt work

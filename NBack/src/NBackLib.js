@@ -116,10 +116,8 @@ RandomNoHitList = function (colorList, shapeList, numBack, colorShapeDependence)
   while (!good){
     good =true;
     stimList = CreateStimuliList(colorList, shapeList, length, [], colorShapeDependence);
-    for (var i=0; i<2; i++){
-      if (stimList[i]['color']==stimList[i+numBack]['color']){
-        good = false;
-      }
+    if (stimList[1]['color']==stimList[1+numBack]['color']){
+      good = false;
     }
   }
   return stimList;
