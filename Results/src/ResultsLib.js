@@ -49,6 +49,11 @@ const RESULTS_META = [
 		"name":"Result #",
 		"format":"integer",
 		"column":"RESULT_ID"
+	},
+	{
+		'name':"Download",
+		'format':'image',
+		'column':"DOWNLOAD"
 	}
 ]
 

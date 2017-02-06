@@ -463,6 +463,8 @@ app.get('/view-results', function(req,res){
 	});
 });
 
+//TODO: allow for downloading a csv file of results
+
 app.post('/new-stimulus', function(req,res){
 	var name = req.body["stimulus-name"];
 	var file = req.files["stimulus-file"];
@@ -594,6 +596,49 @@ app.post('/create-setting', function(req,res){
 			}
 		}
 	})
+});
+
+app.get('/download-results', function(req,res){
+	var task_id=req.query.task_id;
+	var result_id=req.query.result_id;
+	var session_id=req.query.session_id;
+	var csv; //should be a valid csv version of the data
+	switch(task_id){
+		case '1':
+		break;
+		case '2':
+		break;
+		case '3':
+			db.get('SELECT RAW_RESULTS FROM N_BACK_RESULTS WHERE ID =$result_id',{$result_id:result_id},function(err,row){
+				var results = JSON.parse(row['RAW_RESULTS']);
+				var csvList =[];
+				csvList.push(['N-Back Result '+result_id, 'Round', 'Stimulus', 'Pressed','Thinks Hit','Hit','Response Time', 'Correct\n']);
+
+				for (var csv_row in results.rawResults){
+					var csvRow=[];
+					for (var csv_entry in results.rawResults[csv_row]){
+						var entry;
+						if (csv_entry=='Stimulus'){
+							var color = results.rawResults[csv_row][csv_entry].color;
+							var shape = results.rawResults[csv_row][csv_entry].shape;
+							entry = color + ' ' + shape;
+						}else{
+							entry = results.rawResults[csv_row][csv_entry];
+							if (entry===null) entry='N/A';
+						}
+						csvRow.push(entry);
+					}
+					var csvRowString = csvRow.toString() +"\n"
+					csvList.push(csvRowString)
+				}
+				csv = csvList.toString().valueOf();
+				var file_name='session'+session_id+'.csv';
+				var csvData='data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+				var data = {file_name:file_name,file_data:csvData};
+				res.send(data);
+			});
+		break;
+	}
 });
 
 app.get('/', function(req, res) {

@@ -97,16 +97,46 @@ const FORMAT_AND_DISPLAY_SETTINGS_HF = function(setting_id) {
 };
 
 const FORMAT_AND_DISPLAY_RESULTS_NBACK = function(results, id){
-	console.log(results);
-	var displayResults = {
-		"Fraction Correct":results.numCorrect+'/'+results.numStimuli,
-		"Average Correct Response Time":(results.avgCorrectTime),
-	}
+  var rawResList = results.rawResults;
+  var totalMatches = 0;
+  var totalNoMatches = 0;
+  var avgMatchTime=0;
+  var avgNoMatchTime=0;
+  for (var i =0; i<rawResList.length;i++){
+    if (rawResList[i].Hit){
+			totalMatches+=1;
+      if (rawResList[i].ResponseTime){
+        avgMatchTime+=rawResList[i].ResponseTime;
+			}
+    }else{
+			totalNoMatches+=1
+			if (rawResList[i].ResponseTime){
+				avgNoMatchTime+=rawResList[i].ResponseTime;
+			}
+		}
+  }
+  var displayResults= {
+    'Matching Stimuli Results':{
+      'Fraction Correct':results.numCorrectYes + '/'+ totalMatches,
+      'Average Response Time':avgMatchTime/totalMatches,
+    },
+    'Non-Matching Stimuli Results':{
+      'Fraction Correct':results.numCorrectNo+'/'+totalNoMatches,
+      'Average Response Time':avgNoMatchTime/totalNoMatches,
+    },
+    'Total Results':{
+      /*'Score': //need to fix. no score in settings right now so this function doesnt work*/
+			'Fraction Correct':results.numCorrect+'/'+results.numStimuli,
+    }
+  }
 	for (category in displayResults) {
 		var block = document.createElement('p');
 		$(block).append('<strong>'+category+'</strong>')
-		var text =": "+displayResults[category];
-		$(block).append(text);
+		for (item in displayResults[category]) {
+			var line = item+': '+displayResults[category][item];
+			block.appendChild(document.createElement('br'));
+			block.appendChild(document.createTextNode(line));
+		}
 		$(INFO_AREA_ID_SELECTOR).append(block);
 	}
 	$(CLOSE_INFO_MODAL_BUTTON_ID_SELECTOR).click(function(ev,er){
@@ -115,6 +145,7 @@ const FORMAT_AND_DISPLAY_RESULTS_NBACK = function(results, id){
 	});
 	$(INFO_MODAL_ID_SELECTOR).modal('show');
 }
+
 const FORMAT_AND_DISPLAY_SETTINGS_NBACK = function(setting_id) {
 	console.log('we in here')
 	// This gets the settings info for hearts and flowers settings
@@ -244,8 +275,6 @@ $(document).ready(function(){
 									FORMAT_AND_DISPLAY_RESULTS_HF(JSON.parse(result["RAW_RESULTS"]), result["RESULT_ID"]);
 									break;
 								case 3:
-								console.log('here!');
-								console.log(result);
 									FORMAT_AND_DISPLAY_RESULTS_NBACK(JSON.parse(result.RAW_RESULTS),result['RESULT_ID']);
 									break;
 							}
@@ -267,12 +296,32 @@ $(document).ready(function(){
 									FORMAT_AND_DISPLAY_SETTINGS_HF(result["SETTING_ID"]);
 									break;
 								case 3:
-									console.log('here?');
 									FORMAT_AND_DISPLAY_SETTINGS_NBACK(result["SETTING_ID"])
 									break;
 							}
 						})
-					} else {
+					} else if (field['column']=='DOWNLOAD'){
+						console.log("HERE YO");
+						var cell = document.createElement('td');
+						var link = document.createElement('a')
+						var img = document.createElement('img');
+						$(img).attr('src','../../download-arrow.svg');
+						var result_data = {
+							task_id:task_id,
+							result_id:result["RESULT_ID"],
+							session_id:result['SESSION_ID']
+						}
+						$.get('/download-results',result_data,function(data){
+							$(link).attr({
+								'download':data.file_name,
+								'href':data.file_data,
+								'target':'_blank',
+							});
+						});
+						$(link).append(img);
+						$(cell).append(link);
+						$(row).append(cell);
+					}else{
 						var cell = document.createElement("td");
 						$(cell).text(result[field["column"]]);
 						$(row).append(cell);
